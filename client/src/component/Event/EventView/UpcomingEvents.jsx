@@ -77,9 +77,6 @@ const UpcomingEvents = ({ countries, states }) => {
                     <p className="text-base text-zinc-600 dark:text-zinc-300">
                       {formatTime(upcoming.startTime)}
                     </p>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      {upcoming.eventType}
-                    </p>
                     <p className="text-xl font-bold text-zinc-800 dark:text-white">
                       {upcoming.title}
                     </p>
@@ -107,7 +104,6 @@ const UpcomingEvents = ({ countries, states }) => {
                   </div>
 
                   <div className="flex gap-2 items-center mt-2 text-sm text-zinc-700 dark:text-zinc-300">
-                    {upcoming.eventType === "virtual" ? (
                       <>
                         <IoVideocamOutline size={18} />
                         <a
@@ -119,12 +115,10 @@ const UpcomingEvents = ({ countries, states }) => {
                           Join Meeting
                         </a>
                       </>
-                    ) : (
                       <>
                         <IoLocationOutline size={18} />
                         <p>{`${upcoming.location[2]}, ${upcoming.location[1]}`}</p>
                       </>
-                    )}
                   </div>
 
                   <button

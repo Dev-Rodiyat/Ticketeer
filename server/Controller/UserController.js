@@ -152,12 +152,11 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const token = generateToken(user._id);
-    // console.log(token)
     if (user && isMatch) {
       res.cookie("token", token, {
         path: "/",
         httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 86400), //expires within 24hrs
+        expires: new Date(Date.now() + 1000 * 86400),
         sameSite: "none",
         secure: true,
       });

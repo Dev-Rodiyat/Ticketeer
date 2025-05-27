@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 const { Event } = require("../Model/eventModel");
 const { generateQrCode } = require("./qrCode");
 
-const CLIENT_URL = process.env.CLIENT_URL
+const CLIENT_URL = process.env.CLIENT_URL;
 
 const sendCreateEventMail = (data) => {
   const transporter = nodemailer.createTransport({
@@ -53,22 +53,22 @@ const sendCreateEventMail = (data) => {
                     <p style="margin:8px 0;"><strong>⏰ Time:</strong> ${
                       data.startTime
                     }</p>
-                    <p style="margin:8px 0;"><strong>🧭 Type:</strong> ${
-                      data.eventType
-                    }</p>
 
-                    ${
-                      data.eventType === "virtual"
-                        ? `<p style="margin:8px 0;"><strong>🔗 Meet Link:</strong> <a href="${data.meetLink}" style="color:#3b82f6;">Join Now</a></p>`
-                        : `<div style="margin:8px 0;">
+                        <p style="margin:8px 0;"><strong>🔗 Meet Link:</strong> <a href="${
+                          data.meetLink
+                        }" style="color:#3b82f6;">Join Now</a></p>
+                        <div style="margin:8px 0;">
                             <strong>📍 Location:</strong>
                             <p style="margin:4px 0 0;color:#475569;">
                               <p>Venue Name: ${data.location?.venue}</p><br />
-                              <p>Address: ${data.location?.address}, ${data.location?.city}</p><br />
-                              <p>Country: ${data.location?.state}, ${data.location?.country}</p>
+                              <p>Address: ${data.location?.address}, ${
+    data.location?.city
+  }</p><br />
+                              <p>Country: ${data.location?.state}, ${
+    data.location?.country
+  }</p>
                             </p>
-                          </div>`
-                    }
+                          </div>
 
                     <p style="margin:8px 0;"><strong>🆔 Event ID:</strong> #${
                       data.eventId
@@ -174,8 +174,8 @@ const sendCreateTicketMail = (data) => {
 
                   <div style="text-align:center;margin-top:24px;">
                     <a href="${CLIENT_URL}/event-details/${
-                      data.eventId
-                    }" style="background:#f97316;color:white;padding:12px 24px;border-radius:6px;text-decoration:none;">View Event</a>
+    data.eventId
+  }" style="background:#f97316;color:white;padding:12px 24px;border-radius:6px;text-decoration:none;">View Event</a>
                   </div>
                 </td>
               </tr>
@@ -215,7 +215,6 @@ const sendTicketPurchaseMail = async (data) => {
     title,
     startDate,
     startTime,
-    eventType,
     location,
     meetLink,
     status,
@@ -239,10 +238,6 @@ const sendTicketPurchaseMail = async (data) => {
       rejectUnauthorized: false,
     },
   });
-
-  const locationOrLinkHtml = eventType === "physical"
-    ? `<p style="margin:0;padding-bottom:10px;"><strong>Location:</strong> ${location}</p>`
-    : `<p style="margin:0;padding-bottom:10px;"><strong>Link:</strong> <a href="${meetLink}" style="color:#f97316;text-decoration:none;">Join the Event</a></p>`;
 
   const htmlContent = `
   <!DOCTYPE html>
@@ -269,8 +264,8 @@ const sendTicketPurchaseMail = async (data) => {
                     <p style="margin:0;padding-bottom:10px;"><strong>Event:</strong> ${title}</p>
                     <p style="margin:0;padding-bottom:10px;"><strong>Date:</strong> ${startDate}</p>
                     <p style="margin:0;padding-bottom:10px;"><strong>Time:</strong> ${startTime}</p>
-                    <p style="margin:0;padding-bottom:10px;"><strong>Event Type:</strong> ${eventType}</p>
-                    ${locationOrLinkHtml}
+                  <p style="margin:0;padding-bottom:10px;"><strong>Location:</strong> ${location}</p>
+                  <p style="margin:0;padding-bottom:10px;"><strong>Link:</strong> <a href="${meetLink}" style="color:#f97316;text-decoration:none;">Join the Event</a></p>
                     <div style="text-align:center;margin-top:20px;">
                       <p style="font-weight:bold;color:#1e293b;">Your QR Code:</p>
                       <img src="${qrCodeImage}" alt="QR Code" style="width:150px;height:150px;border-radius:8px;" />
@@ -545,9 +540,95 @@ const createEventReminderMail = async () => {
   }
 };
 
+const sendEventUpdateMail = (data) => {
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  const htmlContent = `
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width" />
+      <title>Profile Update Notification</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: Arial, sans-serif;">
+      <table width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 40px 0;">
+        <tr>
+          <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);">
+              <!-- Header -->
+              <tr>
+                <td style="background-color: #1e293b; padding: 24px; text-align: center; color: #ffffff;">
+                  <h2 style="margin: 0; font-size: 24px;">Ticketeer</h2>
+                  <p style="margin: 4px 0 0; font-size: 14px; color: #cbd5e1;">Profile Update Confirmation</p>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding: 32px;">
+                  <h3 style="color: #0f172a; margin-top: 0;">Hello ${data.name},</h3>
+                  <p style="color: #334155; line-height: 1.6;">
+                    We're excited to confirm that you've successfully updated your profile information! 🎉
+                  </p>
+
+                 <p style="color: #334155; margin-top: 24px;">
+                    If you didn’t perform this action, click here to unsubscribe 
+                    <div style="margin-top: 30px; text-align: center;">
+                    <button  style="background-color: #778C99; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">Unsubscribe</button>
+                  </div>
+                  </p>
+
+                  <div style="margin-top: 30px; text-align: center;">
+                    <a href="${CLIENT_URL}/dashboard" style="background-color: #f97316; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">Go to Dashboard</a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td style="background-color: #f1f5f9; padding: 20px; text-align: center; color: #94a3b8; font-size: 12px;">
+                  This message was sent by Ticketeer for profile update confirmation. <br />
+                  Need help? Email us at <a href="mailto:ticketeer01@gmail.com" style="color: #94a3b8;">ticketeer01@gmail.com</a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+`;
+
+  let mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: data.email,
+    subject: `Profile Update Confirmation!`,
+    html: htmlContent,
+  };
+
+  transporter.sendMail(mailOptions, (err, success) => {
+    if (err) {
+      console.error("Error sending email:", err);
+    } else {
+      console.log("Profile Update email sent successfully", data.email);
+    }
+  });
+};
+
 module.exports = {
   sendCreateEventMail,
   sendCreateTicketMail,
+  sendEventUpdateMail,
   createEventReminderMail,
   sendDeleteEventMail,
   sendCancelEventMail,

@@ -64,15 +64,9 @@ const Ticket = ({ onClose, ticket }) => {
             </p>
           )}
 
-          <p>
-            <span className="font-semibold">Event Type:</span> {ticket?.eventId?.eventType}
-          </p>
-
-          {ticket?.eventId?.eventType === "physical" ? (
             <p>
               <span className="font-semibold">Location:</span> {ticket?.eventId?.location}
             </p>
-          ) : (
             <p>
               <span className="font-semibold">Meet Link:</span>{" "}
               <a
@@ -84,7 +78,6 @@ const Ticket = ({ onClose, ticket }) => {
                 {ticket?.eventId?.meetLink}
               </a>
             </p>
-          )}
         </div>
 
         <hr className="my-5 border-slate-200 dark:border-zinc-700" />

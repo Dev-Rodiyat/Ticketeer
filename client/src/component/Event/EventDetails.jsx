@@ -316,6 +316,8 @@ const EventDetails = () => {
 
   if (!eventDetails) return <Loader loading={true} />;
 
+  const refetchEventDetails = () => dispatch(getEventDetails(eventId));
+
   // const event = eventDetails
 
   // console.log({event})
@@ -512,12 +514,15 @@ const EventDetails = () => {
               )}
 
               {/* <Link to="/scan-ticket"> */}
-                <div onClick={handleNavigate} className="flex gap-4 items-start text-zinc-800 dark:text-zinc-200 mb-6 cursor-pointer">
-                  <TbTicket size={24} className="mt-1 hover:text-orange-600" />
-                  <p className="py-1 w-full border-b border-zinc-300 dark:border-zinc-600 text-sm hover:text-orange-600">
-                    Scan Tcket
-                  </p>
-                </div>
+              <div
+                onClick={handleNavigate}
+                className="flex gap-4 items-start text-zinc-800 dark:text-zinc-200 mb-6 cursor-pointer"
+              >
+                <TbTicket size={24} className="mt-1 hover:text-orange-600" />
+                <p className="py-1 w-full border-b border-zinc-300 dark:border-zinc-600 text-sm hover:text-orange-600">
+                  Scan Tcket
+                </p>
+              </div>
               {/* </Link> */}
 
               <div className="flex gap-4 items-center text-zinc-800 dark:text-zinc-200 mt-4">
@@ -671,6 +676,7 @@ const EventDetails = () => {
           onClose={closeAddTicketModal}
           isOpen={openAddTicketModal}
           event={eventDetails}
+          getEventDetails={refetchEventDetails}
         />
       )}
       {cancelModalOpen && (

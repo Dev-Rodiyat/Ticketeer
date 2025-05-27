@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import Loader from "../../Spinners/Loader";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-// import EventDescriptionEditor from "../../Event/EventDescripionInput";
+import EventDescriptionEditor from "../../Event/EventDescripionInput";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -32,7 +32,6 @@ const EditEventModal = ({ event, onClose }) => {
       venueName: "",
       state: "",
     },
-    eventType: "",
     meetLink: "",
     categories: "",
     limit: "",
@@ -50,7 +49,6 @@ const EditEventModal = ({ event, onClose }) => {
         startTime: event.startTime || "",
         endDate: event.endDate?.split("T")[0] || "",
         endTime: event.endTime || "",
-        eventType: event.eventType || "",
         limit: event.limit || 0,
         meetLink: event.meetLink || null,
         location: {
@@ -126,7 +124,7 @@ const EditEventModal = ({ event, onClose }) => {
 
       try {
         const response = await axios.get(
-          `${SERVER_URL}/location/states/${selectedCountry}`
+          ` ${SERVER_URL}/location/states/${selectedCountry}`
         );
         setStates(response.data);
       } catch (error) {
@@ -143,7 +141,7 @@ const EditEventModal = ({ event, onClose }) => {
 
       try {
         const response = await axios.get(
-          `${SERVER_URL}/location/cities/${selectedCountry}/${selectedState}`
+          ` ${SERVER_URL}/location/cities/${selectedCountry}/${selectedState}`
         );
         setCities(response.data);
       } catch (error) {
@@ -153,25 +151,6 @@ const EditEventModal = ({ event, onClose }) => {
 
     fetchCities();
   }, [selectedState, selectedCountry]);
-
-  const handleEventTypeChange = (e) => {
-    const value = e.target.value;
-
-    setFormData((prev) => ({
-      ...prev,
-      eventType: value,
-      location:
-        value === "virtual"
-          ? {
-              address: "",
-              country: "",
-              state: "",
-              city: "",
-              venueName: "",
-            }
-          : prev.location,
-    }));
-  };
 
   const handleDescriptionChange = (value) => {
     setFormData((prev) => ({ ...prev, description: value }));
@@ -212,16 +191,13 @@ const EditEventModal = ({ event, onClose }) => {
 
     const formattedData = {
       ...formData,
-      location:
-        formData.eventType === "physical"
-          ? [
-              formData.location.address,
-              formData.location.country,
-              formData.location.state,
-              formData.location.city,
-              formData.location.venueName,
-            ]
-          : [], // virtual event → no location required
+      location: [
+        formData.location.address,
+        formData.location.country,
+        formData.location.state,
+        formData.location.city,
+        formData.location.venueName,
+      ],
     };
 
     console.log("Submitting data:", formattedData);
@@ -345,129 +321,108 @@ const EditEventModal = ({ event, onClose }) => {
                 </div>
               </div>
 
-              <div>
-                <label className="block mb-1 text-sm font-medium">
-                  Event Type
-                </label>
-                <select
-                  name="eventType"
-                  value={formData.eventType}
-                  onChange={handleEventTypeChange}
-                  className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
-                >
-                  <option value="" disabled>
-                    Select event type
-                  </option>
-                  <option value="virtual">Virtual</option>
-                  <option value="physical">Physical</option>
-                </select>
-              </div>
-
-              {formData.eventType === "physical" ? (
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block mb-1 text-sm font-medium">
-                        Country
-                      </label>
-                      <select
-                        onChange={(e) => setSelectedCountry(e.target.value)}
-                        className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
-                      >
-                        <option value="">Select Country</option>
-                        {countries.map((country) => (
-                          <option key={country.isoCode} value={country.isoCode}>
-                            {country.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block mb-1 text-sm font-medium">
-                        State
-                      </label>
-                      <select
-                        onChange={(e) => setSelectedState(e.target.value)}
-                        className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
-                      >
-                        <option value="">Select State</option>
-                        {states.map((state) => (
-                          <option key={state.isoCode} value={state.isoCode}>
-                            {state.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block mb-1 text-sm font-medium">
-                        City
-                      </label>
-                      <select
-                        onChange={(e) => setSelectedCity(e.target.value)}
-                        className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
-                        value={selectedCity}
-                      >
-                        <option value="">Select City</option>
-                        {cities.map((city) => (
-                          <option key={city.isoCode} value={city.isoCode}>
-                            {city.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block mb-1 text-sm font-medium">
-                        Venue Name
-                      </label>
-                      <input
-                        type="text"
-                        name="venueName"
-                        value={formData.location.venueName}
-                        onChange={handleChange}
-                        className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
-                      />
-                    </div>
-                  </div>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block mb-1 text-sm font-medium">
-                      Address
+                      Country
+                    </label>
+                    <select
+                      onChange={(e) => setSelectedCountry(e.target.value)}
+                      className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
+                    >
+                      <option value="">Select Country</option>
+                      {countries.map((country) => (
+                        <option key={country.isoCode} value={country.isoCode}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block mb-1 text-sm font-medium">
+                      State
+                    </label>
+                    <select
+                      onChange={(e) => setSelectedState(e.target.value)}
+                      className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
+                    >
+                      <option value="">Select State</option>
+                      {states.map((state) => (
+                        <option key={state.isoCode} value={state.isoCode}>
+                          {state.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block mb-1 text-sm font-medium">
+                      City
+                    </label>
+                    <select
+                      onChange={(e) => setSelectedCity(e.target.value)}
+                      className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
+                      value={selectedCity}
+                    >
+                      <option value="">Select City</option>
+                      {cities.map((city) => (
+                        <option key={city.isoCode} value={city.isoCode}>
+                          {city.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block mb-1 text-sm font-medium">
+                      Venue Name
                     </label>
                     <input
                       type="text"
-                      name="address"
-                      value={formData.location.address}
+                      name="venueName"
+                      value={formData.location.venueName}
                       onChange={handleChange}
                       className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
                     />
                   </div>
                 </div>
-              ) : (
                 <div>
                   <label className="block mb-1 text-sm font-medium">
-                    Meeting Link
+                    Address
                   </label>
                   <input
-                    type="url"
-                    name="meetLink"
-                    value={formData.meetLink}
+                    type="text"
+                    name="address"
+                    value={formData.location.address}
                     onChange={handleChange}
                     className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
                   />
                 </div>
-              )}
+              </div>
+              <div>
+                <label className="block mb-1 text-sm font-medium">
+                  Meeting Link
+                </label>
+                <input
+                  type="url"
+                  name="meetLink"
+                  value={formData.meetLink}
+                  onChange={handleChange}
+                  className="w-full border px-3 py-2 rounded-md bg-white dark:bg-zinc-800"
+                />
+              </div>
             </div>
 
             <div>
               <label className="block mb-1 text-sm font-medium">
                 Description
               </label>
-              {/* <EventDescriptionEditor
+              <EventDescriptionEditor
                 value={formData.description}
                 onChange={handleDescriptionChange}
-              /> */}
+              />
             </div>
 
             <div>

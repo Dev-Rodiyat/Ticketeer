@@ -89,12 +89,10 @@ const TicketPage = () => {
                 <strong>Type:</strong> {ticketTypeId?.type || "N/A"}
               </p>
 
-              {eventId?.eventType === "physical" ? (
                 <p>
                   <strong>Location:</strong>{" "}
                   {eventId?.location?.join(", ") || "N/A"}
                 </p>
-              ) : (
                 <p>
                   <strong>Meet Link:</strong>{" "}
                   <a
@@ -106,7 +104,6 @@ const TicketPage = () => {
                     Join Event
                   </a>
                 </p>
-              )}
 
               <p>
                 <strong>Status:</strong> {computedStatus || "N/A"}

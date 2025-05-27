@@ -83,7 +83,6 @@ const NotificationModal = ({ onClose }) => {
                     {new Date(note.createdAt).toLocaleString()}
                   </span>
                 </div>
-                {console.log(note._id)}
                 <button onClick={() => handleDelete(note?._id)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-600 active:bg-orange-100 transition">
                   <IoClose
                     size={18}

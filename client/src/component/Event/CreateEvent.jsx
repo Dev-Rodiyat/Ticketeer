@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-// import EventDescriptionEditor from "./EventDescripionInput";
+import EventDescriptionEditor from "./EventDescripionInput";
 import Loader from "../Spinners/Loader";
 import PreviewDescription from "../Modals/EventModal/PreviewDescription";
+import CountrySelect from "./EventLocation/CountrySelect";
+// import { Select } from "@headlessui/react";
+import Select from "react-select";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -151,7 +154,22 @@ const CreateEvent = () => {
     }
   };
 
-  /* ---------- JSX ---------- */
+  const handleLocationChange = (field, value) => {
+    setEventData((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        [field]: value,
+      },
+    }));
+  };
+
+  const getOptions = (list) =>
+    list.map((item) => ({
+      value: item.isoCode || item.name,
+      label: item.name,
+    }));
+
   return (
     <section className="bg-orange-50 dark:bg-zinc-900 py-20 px-4 sm:px-8 md:px-12 md:py-24 font-inter">
       <div className="max-w-6xl mx-auto">
@@ -275,39 +293,53 @@ const CreateEvent = () => {
                 </div>
 
                 {/* Country / State / City */}
-                {["country", "state", "city"].map((field) => (
-                  <div key={field}>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1">
-                      {field.charAt(0).toUpperCase() + field.slice(1)}
-                    </label>
-                    <select
-                      name={field}
-                      value={eventData.location[field]}
-                      onChange={handleInputChange}
-                      disabled={
-                        (field === "state" && !eventData.location.country) ||
-                        (field === "city" && !eventData.location.state)
-                      }
-                      className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3"
-                    >
-                      <option value="">Select {field}</option>
-                      {(field === "country"
-                        ? countries
-                        : field === "state"
-                        ? states
-                        : cities
-                      ).map((item) => (
-                        <option
-                          key={item.isoCode || item.name}
-                          value={item.isoCode || item.name}
-                        >
-                          {item.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+                {["country", "state", "city"].map((field) => {
+                  const options =
+                    field === "country"
+                      ? getOptions(countries)
+                      : field === "state"
+                      ? getOptions(states)
+                      : getOptions(cities);
+
+                  const isDisabled =
+                    (field === "state" && !eventData.location.country) ||
+                    (field === "city" && !eventData.location.state);
+
+                  return (
+                    <div key={field} className="mb-4">
+                      <label className="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1">
+                        {field.charAt(0).toUpperCase() + field.slice(1)}
+                      </label>
+                      <Select
+                        isSearchable
+                        options={options}
+                        value={
+                          options.find(
+                            (option) =>
+                              option.value === eventData.location[field]
+                          ) || null
+                        }
+                        onChange={(selectedOption) =>
+                          handleLocationChange(field, selectedOption?.value)
+                        }
+                        isDisabled={isDisabled}
+                        placeholder={`Select ${field}`}
+                        classNames={{
+                          control: () =>
+                            "bg-orange-50 dark:bg-zinc-800 border border-orange-300 dark:border-zinc-600 rounded-xl text-sm py-1.5",
+                          menu: () => "text-sm",
+                          singleValue: () => "dark:text-zinc-300",
+                        }}
+                      />
+                    </div>
+                  );
+                })}
               </div>
+
+              {/* <CountrySelect
+                onChange={handleInputChange}
+                countries={countries}
+              /> */}
 
               {/* Address */}
               <div>
@@ -325,7 +357,7 @@ const CreateEvent = () => {
               </div>
             </div>
 
-              <div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
                 Meeting Link <span className="text-gray-500">(optional)</span>
               </label>
@@ -350,10 +382,10 @@ const CreateEvent = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
                 Description
               </label>
-              {/* <EventDescriptionEditor
+              <EventDescriptionEditor
                 value={eventData.description}
                 onChange={handleDescriptionChange}
-              /> */}
+              />
             </div>
 
             <button

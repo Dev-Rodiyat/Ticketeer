@@ -320,7 +320,6 @@ const EventView = () => {
                 </div>
 
                 {/* Location / Link */}
-                {eventDetails?.eventType === "virtual" ? (
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-lg border dark:border-zinc-600 shadow-sm flex flex-col overflow-hidden items-center justify-center">
                       <IoVideocamOutline size={30} />
@@ -339,7 +338,6 @@ const EventView = () => {
                       </a>
                     </div>
                   </div>
-                ) : (
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-lg border dark:border-zinc-600 shadow-sm flex flex-col overflow-hidden items-center justify-center">
                       <IoLocationOutline size={30} />
@@ -358,7 +356,6 @@ const EventView = () => {
                       </p>
                     </div>
                   </div>
-                )}
               </div>
             </div>
 

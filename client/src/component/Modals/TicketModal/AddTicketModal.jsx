@@ -6,8 +6,10 @@ import { toast } from "react-toastify";
 import api from "../../../utils/api";
 import Loader from "../../Spinners/Loader";
 
-const AddTicketModal = ({ isOpen, onClose, event }) => {
+const AddTicketModal = ({ isOpen, onClose, event, getEventDetails }) => {
+  console.log(getEventDetails);
   const { eventId } = useParams();
+  console.log(eventId);
   const [loading, setLoading] = useState(false);
   const [ticketData, setTicketData] = useState({
     type: "",
@@ -20,7 +22,7 @@ const AddTicketModal = ({ isOpen, onClose, event }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTicketData((prev) => ({ ...prev, [name]: value }));
-    setError(""); // Clear the error when the user types
+    setError("");
   };
 
   const createTicket = async () => {
@@ -30,10 +32,12 @@ const AddTicketModal = ({ isOpen, onClose, event }) => {
     }
 
     if (!ticketData.type || !ticketData.price || !ticketData.totalQuantity) {
-      console.log("Missing required fields");
       toast.error("Missing required fields");
       return;
     }
+
+    setLoading(true);
+
     try {
       const response = await api.post(
         `/event/create-ticket/${eventId}`,
@@ -43,23 +47,23 @@ const AddTicketModal = ({ isOpen, onClose, event }) => {
         }
       );
 
-      console.log(response?.data);
       if (response?.data) {
         setTicket(response?.data);
         toast.success("Ticket Created Successfully");
+        console.log("Refetching event...");
+        await getEventDetails();
+        console.log("Refetch complete.");
         onClose();
-        // navigate("/dashboard");
       }
     } catch (error) {
       const errorMessage =
         error?.response?.data?.message ||
         error.message ||
         "Internal server error";
-      setError(errorMessage); // Set error message
+      setError(errorMessage);
       toast.error(errorMessage);
     } finally {
-      setLoading(false);
-      setIsSubmitting(false);
+      setLoading(false); // ✅ Properly turn it off after
     }
   };
 
@@ -68,9 +72,9 @@ const AddTicketModal = ({ isOpen, onClose, event }) => {
     createTicket();
   };
 
-  if (loading) {
-    return <Loader loading={loading} />;
-  }
+  // if (loading) {
+  //   return <Loader loading={loading} />;
+  // }
 
   return (
     <Transition appear show={isOpen} as={Fragment} className="font-inter">
@@ -162,9 +166,40 @@ const AddTicketModal = ({ isOpen, onClose, event }) => {
                   <div className="flex justify-end">
                     <button
                       type="submit"
-                      className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-full text-sm"
+                      disabled={loading}
+                      className={`${
+                        loading
+                          ? "bg-orange-400 cursor-not-allowed"
+                          : "bg-orange-600 hover:bg-orange-700"
+                      } text-white px-4 py-2 rounded-full text-sm flex items-center gap-2`}
                     >
-                      Create Ticket
+                      {loading ? (
+                        <>
+                          <svg
+                            className="animate-spin h-4 w-4 text-white"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8v4l3.536-3.536a1 1 0 10-1.414-1.414L12 4.586V0a12 12 0 00-8 20.485l1.414-1.414A9.959 9.959 0 014 12z"
+                            />
+                          </svg>
+                          Creating...
+                        </>
+                      ) : (
+                        "Create Ticket"
+                      )}
                     </button>
                   </div>
                 </form>

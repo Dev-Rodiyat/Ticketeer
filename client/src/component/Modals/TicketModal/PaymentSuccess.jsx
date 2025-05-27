@@ -70,9 +70,6 @@ const SuccessPage = () => {
               <span className="font-semibold">Date:</span>{" "}
               {formatDate(event.startDate)} at {event.startTime}
             </p>
-            <p>
-              <span className="font-semibold">Type:</span> {event.eventType}
-            </p>
           </div>
 
           <div className="border-t pt-4 border-slate-400 gap-4 grid grid-cols-2">

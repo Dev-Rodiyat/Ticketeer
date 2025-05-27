@@ -132,9 +132,6 @@ const Events = ({ countries, states }) => {
                           <p className="font-medium text-lg text-gray-700">
                             {formatTime(event.startTime)}
                           </p>
-                          <p className="text-sm capitalize">
-                            {event.eventType}
-                          </p>
                           <p className="font-semibold text-xl">{event.title}</p>
                         </div>
 
@@ -153,8 +150,7 @@ const Events = ({ countries, states }) => {
                         </div>
 
                         <div className="flex gap-2 items-center text-sm">
-                          {event.eventType === "virtual" ? (
-                            <>
+                          <>
                               <IoVideocamOutline size={20} />
                               <a
                                 href={event.meetLink}
@@ -165,12 +161,10 @@ const Events = ({ countries, states }) => {
                                 Join Meeting
                               </a>
                             </>
-                          ) : (
                             <>
                               <IoLocationOutline size={20} />
                               <p>{`${event.location[2]}, ${event.location[1]}`}</p>
                             </>
-                          )}
                         </div>
 
                         <button

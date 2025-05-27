@@ -54,6 +54,8 @@ import ProfilePage from "./component/User/Profile/ProfilePage";
 import PreviewDescription from "./component/Modals/EventModal/PreviewDescription";
 import TicketScanner from "./component/Ticket/TicketScanner";
 import TicketCheckIn from "./component/Ticket/TicketCheckIn";
+import LocationSelector from "./component/Event/EventLocation/LocationSelector";
+import CountrySelect from "./component/Event/EventLocation/CountrySelect";
 
 function App() {
   const dispatch = useDispatch();
@@ -66,7 +68,7 @@ function App() {
   //   document.documentElement.classList.toggle("dark", themeMode === "dark");
   // }, [themeMode]);
   useEffect(() => {
-    const currentTheme = themeMode === "dark" ? "dark" : "light";
+    const currentTheme = themeMode === "light" ? "dark" : "light";
     document.documentElement.classList.toggle("dark", currentTheme === "dark");
   }, [themeMode]);
 
@@ -169,6 +171,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/connect-wallet" element={<ConnectWallet />} />
         <Route path="/paystack-checkout" element={<PaystackCheckout />} />
+        <Route path="/location" element={<LocationSelector />} />
+        <Route path="/country" element={<CountrySelect />} />
 
         {/* Protected Routes */}
         <Route

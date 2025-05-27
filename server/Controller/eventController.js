@@ -199,7 +199,6 @@ const createTicket = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    // ✅ Only the organizer of the event can create ticket types
     if (!user || user._id.toString() !== event.organizer.toString()) {
       return res.status(403).json({
         message: "You are not authorized to create tickets for this event.",
@@ -547,8 +546,6 @@ const purchaseTicketLogic = async ({ eventId, selectedTickets, userId }) => {
       }
     );
 
-    console.log("responsePayload: ", responsePayload);
-
     for (const meta of ticketMetaList) {
       const { ticketType, ticketIds, purchaseDate } = meta;
 
@@ -586,22 +583,14 @@ const purchaseTicketLogic = async ({ eventId, selectedTickets, userId }) => {
       };
 
       try {
-        console.log(`Ticket Purchase Email sent for type: ${ticketType?.type}`);
         await sendTicketPurchaseMail(mailData);
-        // await emailQueue.add(mailData, {
-        //   attempts: 3,     // Retry 3 times on failure
-        //   backoff: 5000,   // 5s delay between retries
-        // });
-
-        // Send one notification per ticket type with quantity info
+       
         await Notification.create({
           user: userId,
           type: "ticket",
           message: `You purchased ${ticketIds.length} ${ticketType?.type} ticket(s) to ${event.title}`,
           metadata: { ticketTypeId: ticketType._id, eventId: event._id },
         });
-        // console.log("Notification sent to: ", user._id);
-        // console.log("Notification sent to: ", userId);
       } catch (postError) {
         console.error("Post-transaction operation failed:", postError);
       }
@@ -627,19 +616,14 @@ const attendeeCheckIn = asyncHandler(async (req, res) => {
     const ticket = await Ticket.findById(ticketId);
     if (!ticket) return res.status(404).json({ message: "Ticket not found" });
 
-    console.log({ ticket });
-
     // Optional: Check if ticket is already checked in
     if (ticket.status === "checkedIn") {
       return res.status(400).json({ message: "Ticket already checked in" });
     }
 
-    // Optional: Check if ticket is valid for this event, date, etc.
-
     ticket.status = "checkedIn";
     await ticket.save();
 
-    console.log("Done");
     return res.json({ message: "Ticket checked in successfully", ticket });
   } catch (error) {
     console.error(error);
@@ -1709,7 +1693,7 @@ const updateEvent = async (req, res) => {
       event.location = location;
     }
 
-    if (meetLink !== undefined) {
+    if (meetLink) {
       const hasValidMeetLink =
         typeof meetLink === "string" &&
         meetLink.trim() !== "" &&
@@ -1735,6 +1719,20 @@ const updateEvent = async (req, res) => {
     event.limit = limit ?? event.limit;
 
     const updatedEvent = await event.save();
+
+     try {
+        await sendTicketPurchaseMail(mailData);
+       
+        await Notification.create({
+          user: userId,
+          type: "ticket",
+          message: `You purchased ${ticketIds.length} ${ticketType?.type} ticket(s) to ${event.title}`,
+          metadata: { ticketTypeId: ticketType._id, eventId: event._id },
+        });
+      } catch (postError) {
+        console.error("Post-transaction operation failed:", postError);
+      }
+      
     return res.status(200).json(updatedEvent);
   } catch (error) {
     console.error("Error updating event:", error);

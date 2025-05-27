@@ -99,9 +99,6 @@ const FavouriteEvents = () => {
                     <p className="text-base text-zinc-600 dark:text-zinc-300">
                       {formatTime(favourite.startTime)}
                     </p>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      {favourite.eventType}
-                    </p>
                     <p className="text-xl font-bold text-zinc-800 dark:text-white">
                       {favourite.title}
                     </p>
@@ -129,7 +126,6 @@ const FavouriteEvents = () => {
                   </div>
 
                   <div className="flex gap-2 items-center mt-1 text-sm text-zinc-700 dark:text-zinc-300">
-                    {favourite.eventType === "virtual" ? (
                       <>
                         <IoVideocamOutline size={18} />
                         <a
@@ -141,12 +137,10 @@ const FavouriteEvents = () => {
                           Join Meeting
                         </a>
                       </>
-                    ) : (
                       <>
                         <IoLocationOutline size={18} />
                         <p>{`${favourite.location[2]}, ${favourite.location[1]}`}</p>
                       </>
-                    )}
                   </div>
 
                   <button

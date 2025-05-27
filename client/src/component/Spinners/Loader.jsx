@@ -1,7 +1,7 @@
 import React from "react";
 import ClipLoader from "react-spinners/ClipLoader";
 
-const Loader = ({ loading, text = "Loading..." }) => {
+const Loader = ({ loading, text = "Please wait..." }) => {
   return (
     loading && (
       <div className="fixed inset-0 flex items-center justify-center z-50 bg-orange-100 bg-opacity-60 dark:bg-zinc-300">

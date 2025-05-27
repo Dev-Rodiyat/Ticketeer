@@ -3,14 +3,14 @@ import { usePaystackPayment } from "react-paystack";
 import api from "../../utils/api";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import Loader from "../Spinners/Loader";
 
 const PaystackCheckout = ({ user, event, selectedTickets, tickets }) => {
   const navigate = useNavigate();
   const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
 
-  // Calculate total with 2% fee
-  // selectedTickets is now an array: [{ticketTypeId, quantity}]
   const total = selectedTickets.reduce((sum, { ticketTypeId, quantity }) => {
     const ticket = tickets.find((t) => t._id === ticketTypeId);
     if (!ticket) return sum;
@@ -33,7 +33,6 @@ const PaystackCheckout = ({ user, event, selectedTickets, tickets }) => {
     try {
       setIsLoading(true);
 
-      // Step 1: Validate ticket selection with array format
       const validationRes = await api.post(
         "/payments/validate",
         {
@@ -65,7 +64,8 @@ const PaystackCheckout = ({ user, event, selectedTickets, tickets }) => {
         },
         onSuccess: async (refData) => {
           try {
-            // Step 4: Verify payment on server with array format
+            setIsVerifying(true); // Start loader before verification
+
             const res = await api.post(
               "/payments/paystack/verify",
               {
@@ -76,13 +76,11 @@ const PaystackCheckout = ({ user, event, selectedTickets, tickets }) => {
               { withCredentials: true }
             );
 
-            console.log({res})
-
             if (res.data.success) {
               toast.success("Payment verified and ticket(s) issued!");
               navigate("/payment-success", {
-                state: { event, selectedTickets, tickets: res?.data?.tickets }, // ✅ safer
-              });              
+                state: { event, selectedTickets, tickets: res?.data?.tickets },
+              });
             } else {
               toast.error("Payment verification failed.");
               navigate("/payment-failed");
@@ -90,6 +88,8 @@ const PaystackCheckout = ({ user, event, selectedTickets, tickets }) => {
           } catch (err) {
             toast.error("Verification failed.");
             navigate("/payment-failed");
+          } finally {
+            setIsVerifying(false);
           }
         },
         onClose: () => toast.error("Payment popup closed"),
@@ -107,12 +107,18 @@ const PaystackCheckout = ({ user, event, selectedTickets, tickets }) => {
 
   if (!user || !event?._id || total === 0) return null;
 
+  if (isVerifying) {
+    return <Loader loading={isVerifying} />;
+  }
+
   return (
     <button
       onClick={handleClick}
       disabled={isLoading}
       className={`mt-4 self-start px-10 py-3 ${
-        isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-orange-500 hover:bg-orange-600"
+        isLoading
+          ? "bg-gray-400 cursor-not-allowed"
+          : "bg-orange-500 hover:bg-orange-600"
       } text-white font-semibold rounded-full transition`}
     >
       {isLoading ? "Processing..." : `Pay ₦${total.toFixed(2)}`}

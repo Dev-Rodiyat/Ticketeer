@@ -123,9 +123,6 @@ const MyTickets = () => {
                     <p className="text-base font-semibold text-zinc-700 dark:text-zinc-200">
                       {formatTime(upcoming?.eventId?.startTime)}
                     </p>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400 capitalize">
-                      {upcoming?.eventId?.eventType}
-                    </p>
                     <p className="text-xl font-bold text-zinc-800 dark:text-zinc-100">
                       {upcoming?.eventId?.title}
                     </p>
@@ -161,7 +158,6 @@ const MyTickets = () => {
 
                   {/* Event Type Info */}
                   <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                    {upcoming?.eventId?.eventType === "virtual" ? (
                       <>
                         <IoVideocamOutline className="text-lg" />
                         <a
@@ -173,12 +169,10 @@ const MyTickets = () => {
                           Join Meeting
                         </a>
                       </>
-                    ) : (
                       <>
                         <IoLocationOutline className="text-lg" />
                         <span>{`${upcoming?.eventId?.location[2]}, ${upcoming?.eventId?.location[1]}`}</span>
                       </>
-                    )}
                   </div>
 
                   <button
