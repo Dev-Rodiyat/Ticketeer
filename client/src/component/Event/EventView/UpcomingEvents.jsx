@@ -35,7 +35,7 @@ const UpcomingEvents = ({ countries, states }) => {
   const { userUpcomingEvents, loading, error } = useSelector(
     (state) => state.events
   );
-
+ 
   const { user, isAuthenticated } = useSelector((state) => state.user);
 
   useEffect(() => {
