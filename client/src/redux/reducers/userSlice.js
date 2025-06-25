@@ -189,7 +189,7 @@ const initialState = {
   status: "idle",
   error: null,
   // themeMode: storedUser?.user?.themeMode || "light",
-  themeMode: localStorage.getItem("theme") || "light",
+  themeMode: localStorage.getItem("themeMode") || "light",
   loading: {
     register: false,
     login: false,
@@ -223,8 +223,8 @@ const userSlice = createSlice({
     },
     toggleTheme(state) {
       state.themeMode = state.themeMode === "light" ? "dark" : "light";
-      localStorage.setItem("theme", state.themeMode);
-      document.documentElement.classList.toggle("dark", state.themeMode === "dark");
+      localStorage.setItem("themeMode", state.themeMode);
+      document.documentElement.classList.toggle("light", state.themeMode === "light");
     
       const storedUser = loadUserFromStorage();
       if (storedUser) {
@@ -348,15 +348,15 @@ const userSlice = createSlice({
         state.status = "succeeded";
         state.themeMode = action.payload;
         state.themeMode = state.themeMode === "light" ? "dark" : "light";
-        localStorage.setItem("theme", state.themeMode);
+        localStorage.setItem("themeMode", state.themeMode);
       
         if (state.user) {
           state.user.themeMode = action.payload;
-          saveUserToStorage(state.user, state.token); // ✅ persist updated theme
+          saveUserToStorage(state.user, state.token);
         }
       
         if (typeof document !== "undefined") {
-          document.documentElement.classList.toggle("dark", action.payload === "dark");
+          document.documentElement.classList.toggle("light", action.payload === "light");
         }
       })
       .addCase(toggleThemeMode.rejected, (state, action) => {

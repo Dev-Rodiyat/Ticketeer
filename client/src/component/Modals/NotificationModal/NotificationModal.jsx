@@ -1,54 +1,55 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { MdNotificationsOff } from "react-icons/md";
 import Header from "../../Reusables/Header";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteAllNotifications, deleteNotification } from "../../../redux/reducers/eventSlice";
+import {
+  deleteAllNotifications,
+  deleteNotification,
+  fetchNotifications,
+} from "../../../redux/reducers/eventSlice";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const NotificationModal = ({ onClose }) => {
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const location = useLocation();
 
-  const {user} = useSelector(state => state.user)
-  const { notifications } =
-    useSelector((state) => state.events);
+  const { user } = useSelector((state) => state.user);
+  const { notifications } = useSelector((state) => state.events);
 
-    const handleDelete = async (notificationId) => {
-      if (user) {
-        try {
-          await dispatch(deleteNotification(notificationId)).unwrap();
-          toast.success("Notification deleted successfully");
-        } catch (error) {
-          toast.error(error || "Failed to delete notification");
-        }
-      } else {
-        toast.error("Unable to delete notification");
+  useEffect(() => {
+    if ((user, notifications)) {
+      dispatch(fetchNotifications());
+    }
+  }, [user, dispatch, notifications]);
+
+  const handleDelete = async (notificationId) => {
+    if (user) {
+      try {
+        await dispatch(deleteNotification(notificationId)).unwrap();
+        toast.success("Notification deleted successfully");
+      } catch (error) {
+        toast.error(error || "Failed to delete notification");
       }
-    };    
+    } else {
+      toast.error("Unable to delete notification");
+    }
+  };
 
   const handleDeleteAll = async () => {
     if (user) {
       try {
         await dispatch(deleteAllNotifications()).unwrap();
-        toast.success("Event deleted successfully");
+        toast.success("All notifications deleted successfully");
         navigate("/dashboard");
       } catch (error) {
-        toast.error(error || "Failed to delete event");
+        toast.error(error || "Failed to delete notifications");
       }
     } else {
-      toast.error("Unable to delete event");
+      toast.error("Unable to delete notifications");
     }
-  };
-
-  console.log({ notifications });
-
-  const handleNavigate = (eventId) => {
-    navigate(`/event-details/${eventId}`, {
-      state: { from: location.pathname },
-    });
   };
 
   return (
@@ -70,9 +71,9 @@ const NotificationModal = ({ onClose }) => {
         {/* Notifications List */}
         <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-3 space-y-3 max-h-[70vh]">
           {Array.isArray(notifications) && notifications.length > 0 ? (
-            notifications.map((note, index) => (
+            notifications.map((note) => (
               <div
-                key={index}
+                key={note._id}
                 className="flex items-start gap-3 p-4 bg-zinc-50 dark:bg-zinc-800 rounded-xl cursor-pointer shadow-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 transition"
               >
                 <div className="flex-1">
@@ -83,7 +84,10 @@ const NotificationModal = ({ onClose }) => {
                     {new Date(note.createdAt).toLocaleString()}
                   </span>
                 </div>
-                <button onClick={() => handleDelete(note?._id)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-600 active:bg-orange-100 transition">
+                <button
+                  onClick={() => handleDelete(note._id)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-600 active:bg-orange-100 transition"
+                >
                   <IoClose
                     size={18}
                     className="text-zinc-600 dark:text-zinc-300"
@@ -105,13 +109,17 @@ const NotificationModal = ({ onClose }) => {
 
         {Array.isArray(notifications) && notifications.length > 0 && (
           <div className="sticky bottom-0 px-5 py-4 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-700 flex justify-center">
-            <button onClick={handleDeleteAll} className="py-2 px-6 bg-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition">
+            <button
+              onClick={handleDeleteAll}
+              className="py-2 px-6 bg-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition"
+            >
               Clear All
             </button>
           </div>
         )}
       </div>
 
+      {/* Hidden Header used for side effects or rerenders if needed */}
       <div className="hidden">
         <Header notification={notifications} />
       </div>

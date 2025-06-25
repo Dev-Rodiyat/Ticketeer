@@ -1208,12 +1208,14 @@ const getUserEvents = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "No events found" });
     }
 
+    console.log(events)
+
     return res.status(200).json(events);
   } catch (error) {
     console.error("Error fetching user events:", error);
     return res.status(400).json({ message: error.message });
   }
-});
+}); 
 
 const upcomingEvents = async (req, res) => {
   try {
@@ -1274,6 +1276,8 @@ const upcomingEvents = async (req, res) => {
       );
       return aStart - bStart;
     });
+
+     console.log({ attendees: upcomingEvents });
 
     return res.status(200).json(upcomingEvents);
   } catch (error) {
@@ -1358,6 +1362,8 @@ const getAttendeesForEvent = async (req, res) => {
     if (!event) {
       return res.status(404).json({ message: "No attendees found" });
     }
+
+    console.log(event)
 
     return res.status(200).json(event);
   } catch (error) {

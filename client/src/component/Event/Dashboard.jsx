@@ -23,6 +23,7 @@ const Dashboard = () => {
 
   const {
     userEvents,
+    userTickets,
     loading: eventsLoading,
     error: eventsError,
   } = useSelector((state) => state.events);
@@ -118,7 +119,7 @@ const Dashboard = () => {
                 </div>
                 <div className="flex flex-col justify-center items-center gap-2 py-5 px-4 w-full h-[100px] bg-white dark:bg-zinc-900 rounded-2xl shadow-md border border-orange-200 dark:border-zinc-700">
                   <p className="text-xl font-bold text-orange-600">
-                    {user?.ticket?.length || 0}
+                    {userTickets?.length || 0}
                   </p>
                   <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     Tickets Purchased

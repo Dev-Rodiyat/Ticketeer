@@ -2,7 +2,11 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getUser } from "./redux/reducers/userSlice";
-import { fetchNotifications, getUserEvents, getUserTickets } from "./redux/reducers/eventSlice";
+import {
+  fetchNotifications,
+  getUserEvents,
+  getUserTickets,
+} from "./redux/reducers/eventSlice";
 
 // Layouts
 import Layout from "./component/Layouts/Layout";
@@ -68,21 +72,17 @@ function App() {
   //   document.documentElement.classList.toggle("dark", themeMode === "dark");
   // }, [themeMode]);
   useEffect(() => {
-    const currentTheme = themeMode === "light" ? "dark" : "light";
-    document.documentElement.classList.toggle("dark", currentTheme === "dark");
+    if (themeMode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
   }, [themeMode]);
 
   // Fetch user on app load
   useEffect(() => {
     dispatch(getUser());
   }, [dispatch]);
-
-  useEffect(() => {
-    if (user) {
-      dispatch(getUserTickets());
-      dispatch(fetchNotifications());
-    }
-  }, [user, dispatch]);
 
   useEffect(() => {
     if (!isAuthPage && !user) {
@@ -93,6 +93,8 @@ function App() {
   useEffect(() => {
     if (user) {
       dispatch(getUserEvents());
+      dispatch(getUserTickets());
+      dispatch(fetchNotifications());
     }
   }, [user, dispatch]);
 

@@ -104,7 +104,7 @@ const CreateTicket = () => {
       console.log(response?.data);
       if (response?.data) {
         setTicket(response?.data);
-        toast.success("Event Created Successfully");
+        toast.success("Ticket Created Successfully");
         navigate("/dashboard");
       }
     } catch (error) {

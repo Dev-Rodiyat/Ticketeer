@@ -45,8 +45,8 @@ const ProfileModal = ({ onClose, isOpen }) => {
             <img
               src={
                 user?.photo?.imageUrl ||
-                user?.photo ||
-                import.meta.env.DEFAULT_IMAGE_URL
+                user?.photo
+                // import.meta.env.DEFAULT_IMAGE_URL
               }
               alt="User"
               className="w-full h-full object-cover"

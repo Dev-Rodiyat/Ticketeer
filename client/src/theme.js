@@ -1,4 +1,4 @@
-const THEME_KEY = 'theme'
+const THEME_KEY = 'themeMode'
 
 export function enableDarkMode() {
   document.documentElement.classList.add('dark')
@@ -31,7 +31,6 @@ export function loadSavedTheme() {
   } else if (savedTheme === 'light') {
     disableDarkMode()
   } else {
-    // Optional: match system preference if no saved theme
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     prefersDark ? enableDarkMode() : disableDarkMode()
   }

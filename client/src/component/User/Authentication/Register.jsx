@@ -18,7 +18,6 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
-  const [isChecked, setIsChecked] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [passwordStrengthError, setPasswordStrengthError] = useState("");
 
@@ -73,10 +72,6 @@ const Register = () => {
     if (registerUser.fulfilled.match(resultAction)) {
       navigate("/dashboard");
     }
-  };
-
-  const handleCheckboxChange = () => {
-    setIsChecked(!isChecked);
   };
 
   const handlePastePassword = (e) => {
@@ -205,43 +200,16 @@ const Register = () => {
                 <p className="text-red-500 text-sm">{passwordError}</p>
               )}
 
-              {/* Terms and checkbox */}
-              <div className="flex gap-2 items-start mt-1">
-                <input
-                  type="checkbox"
-                  className="mt-1 cursor-pointer"
-                  checked={isChecked}
-                  onChange={handleCheckboxChange}
-                />
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  I agree to the{" "}
-                  <Link
-                    to="/terms-and-conditions"
-                    className="text-orange-600 hover:underline"
-                  >
-                    terms & conditions
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    to="/privacy-policy"
-                    className="text-orange-600 hover:underline"
-                  >
-                    privacy policy
-                  </Link>{" "}
-                  of Ticketeer
-                </p>
-              </div>
-
               {/* Submit + Social Auth */}
               <div className="flex flex-col gap-4 items-center mt-2">
                 <button
                   type="submit"
                   className={`py-3 px-6 w-full md:w-2/3 font-medium rounded-full text-white transition-all duration-300 ${
-                    isChecked
+                    loading.register
                       ? "bg-orange-400 hover:bg-orange-500"
                       : "bg-orange-300 cursor-not-allowed"
                   }`}
-                  disabled={!isChecked || loading.register}
+                  disabled={loading.register}
                 >
                   {loading.register ? "Creating Account..." : "Create Account"}
                 </button>
@@ -254,16 +222,6 @@ const Register = () => {
                   Already have an account?{" "}
                   <Link to="/login" className="text-orange-400 hover:underline">
                     Login
-                  </Link>
-                </p>
-
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Need help?{" "}
-                  <Link
-                    to="/contact"
-                    className="text-orange-400 hover:underline"
-                  >
-                    Contact Support
                   </Link>
                 </p>
               </div>

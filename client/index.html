@@ -9,7 +9,7 @@
   <body>
     <div id="root"></div>
     <script>
-      const theme = localStorage.getItem("theme") || "light";
+      const theme = localStorage.getItem("themeMode") || "light";
       if (theme === "dark") {
         document.documentElement.classList.add("dark");
       } else {

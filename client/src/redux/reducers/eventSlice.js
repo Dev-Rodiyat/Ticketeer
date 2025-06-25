@@ -311,7 +311,7 @@ export const deleteNotification = createAsyncThunk(
   "notifications/deleteNotification",
   async (notificationId, { rejectWithValue }) => {
     try {
-      const response = await api.delete(`/notifications/delete-notification/${notificationId}`, {
+      const response = await api.delete(`/notification/delete-notification/${notificationId}`, {
         withCredentials: true,
       });
       console.log(response.data);
@@ -328,7 +328,7 @@ export const deleteAllNotifications = createAsyncThunk(
   "notifications/deleteAllNotifications",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.delete(`/notifications/delete-all-notifications`, {
+      const response = await api.delete(`/notification/delete-all-notifications`, {
         withCredentials: true,
       });
       console.log(response.data);
@@ -422,6 +422,14 @@ const eventSlice = createSlice({
   reducers: {
     setCurrentEvent(state, action) {
       state.currentEvent = action.payload;
+    },
+     setNotifications: (state, action) => {
+      state.notifications = action.payload;
+    },
+    removeNotificationFromState: (state, action) => {
+      state.notifications = state.notifications.filter(
+        (notification) => notification._id !== action.payload
+      );
     },
   },
   extraReducers: (builder) => {
@@ -781,5 +789,5 @@ const eventSlice = createSlice({
   },
 });
 
-export const { setCurrentEvent } = eventSlice.actions;
+export const { setCurrentEvent, removeNotificationFromState, setNotifications } = eventSlice.actions;
 export default eventSlice.reducer;

@@ -136,7 +136,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     if (!email || !password) {
       console.error("Email or password not provided");
-      return res.status(404).json({ message: "Please add email and password" });
+      return res.status(400).json({ message: "Please add email and password" });
     }
 
     let user = await User.findOne({ email }).populate("photo");
@@ -146,40 +146,45 @@ const loginUser = asyncHandler(async (req, res) => {
         .status(404)
         .json({ message: "User Not Found, please create an account" });
     }
+
+    // Check if the user registered via Google
+    if (user.authType === 'google') {
+      return res.status(400).json({
+        message: "This account was created using Google. Please log in with Google.",
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) { 
       return res.status(400).json({ message: "Invalid Credentials" });
     }
 
     const token = generateToken(user._id);
-    if (user && isMatch) {
-      res.cookie("token", token, {
-        path: "/",
-        httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 86400),
-        sameSite: "none",
-        secure: true,
-      });
 
-      const { _id, name, email, photo, location, interests, socialMediaLinks, themeMode } =
-        user;
+    res.cookie("token", token, {
+      path: "/",
+      httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 86400),
+      sameSite: "none",
+      secure: true,
+    });
 
-      res.status(200).json({
-        _id,
-        name,
-        email,
-        photo,
-        location,
-        interests,
-        socialMediaLinks,
-        token,
-        themeMode
-      });
-      await sendUserLogInMail({ name, email });
-    } else {
-      console.error("Unexpected error during login for user:", email, token);
-      res.status(500).json("Something went wrong, please try again");
-    }
+    const { _id, name, email: userEmail, photo, location, interests, socialMediaLinks, themeMode } = user;
+
+    res.status(200).json({
+      _id,
+      name,
+      email: userEmail,
+      photo,
+      location,
+      interests,
+      socialMediaLinks,
+      token,
+      themeMode
+    });
+
+    await sendUserLogInMail({ name, email: userEmail });
   } catch (error) {
     console.log("Error during login process:", error);
     return res.status(500).json({ message: error.message });
