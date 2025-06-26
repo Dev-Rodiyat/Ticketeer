@@ -41,7 +41,6 @@ import Ticket from "./component/Modals/TicketModal/Ticket";
 import PurchaseTicketModal from "./component/Modals/TicketModal/PurchaseTicketModal";
 import Settings from "./component/User/Setting/Settings";
 import ProfileUpdate from "./component/User/Setting/ProfileUpdate";
-import UserProfile from "./component/User/UserProfile";
 
 // Spinners
 import Loader from "./component/Spinners/Loader";
@@ -381,16 +380,6 @@ function App() {
             <ProtectedRoute>
               <UserLayout>
                 <ProfileUpdate />
-              </UserLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/userProfile"
-          element={
-            <ProtectedRoute>
-              <UserLayout>
-                <UserProfile />
               </UserLayout>
             </ProtectedRoute>
           }

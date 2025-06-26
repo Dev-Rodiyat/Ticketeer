@@ -184,7 +184,7 @@ const loginUser = asyncHandler(async (req, res) => {
       themeMode
     });
 
-    await sendUserLogInMail({ name, email: userEmail });
+    
   } catch (error) {
     console.log("Error during login process:", error);
     return res.status(500).json({ message: error.message });
