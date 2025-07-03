@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { loadSlim } from "tsparticles-slim";
-import Particles from "react-tsparticles";
-import { useCallback } from "react";
+import Confetti from "react-confetti";
+import { useWindowSize } from "@react-hook/window-size";
 import TicketeerLogo from "./../../assets/Ticketeer-Logo.png";
 
 const SplashScreen = ({ onComplete }) => {
   const [show, setShow] = useState(true);
+  const [width, height] = useWindowSize();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -15,10 +15,6 @@ const SplashScreen = ({ onComplete }) => {
     }, 3000);
     return () => clearTimeout(timer);
   }, [onComplete]);
-
-  const particlesInit = useCallback(async (engine) => {
-    await loadSlim(engine);
-  }, []);
 
   return (
     <AnimatePresence>
@@ -29,39 +25,17 @@ const SplashScreen = ({ onComplete }) => {
           exit={{ opacity: 0, filter: "blur(8px)" }}
           transition={{ duration: 0.6 }}
         >
-          {/* Particle Background */}
-          <Particles
-            init={particlesInit}
-            className="absolute inset-0 z-0"
-            options={{
-              fullScreen: false,
-              background: { color: { value: "transparent" } },
-              fpsLimit: 60,
-              particles: {
-                color: { value: "#f97316" },
-                links: {
-                  color: "#f97316",
-                  distance: 100,
-                  enable: true,
-                  opacity: 0.2,
-                  width: 1,
-                },
-                move: {
-                  enable: true,
-                  speed: 1.5,
-                  direction: "none",
-                  outModes: { default: "bounce" },
-                },
-                number: {
-                  value: 50,
-                  density: { enable: true, area: 800 },
-                },
-                opacity: { value: 0.3 },
-                shape: { type: "circle" },
-                size: { value: { min: 1, max: 4 } },
-              },
-              detectRetina: true,
-            }}
+          {/* Confetti Background */}
+          <Confetti
+            width={width}
+            height={height}
+            numberOfPieces={500}
+            recycle={true}
+            colors={['#f97316', '#fb923c', '#fdba74', '#fed7aa', '#ffedd5']}
+            gravity={0.1}
+            wind={0.02}
+            initialVelocityY={5}
+            opacity={0.6}
           />
 
           <motion.img

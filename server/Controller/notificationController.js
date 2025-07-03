@@ -44,8 +44,9 @@ exports.deleteNotification = expressAsyncHandler(async (req, res) => {
 exports.deleteAllNotifications = expressAsyncHandler(async (req, res) => {
   try {
     const result = await Notification.deleteMany({ userId: req.userId });
+    console.log({result})
 
-    if (result.length <= 0) {
+    if (result.deletedCount === 0) {
       return res
         .status(404)
         .json({ message: "No notifications found to delete" });

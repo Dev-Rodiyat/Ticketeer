@@ -47,7 +47,6 @@ import Loader from "./component/Spinners/Loader";
 import RouteChangeLoader from "./component/Spinners/RouteChangeLoader";
 import PaymentSuccess from "./component/Modals/TicketModal/PaymentSuccess";
 import PaymentCancel from "./component/Modals/TicketModal/PaymentCancel";
-import ConnectWallet from "./component/Wallet/ConnectWallet";
 import UsingHooks from "./component/Payment/UsingHooks";
 import EventDescriptionInput from "./component/Event/EventDescripionInput";
 import PaystackCheckout from "./component/Payment/PaystackCheckout";
@@ -96,6 +95,12 @@ function App() {
       dispatch(fetchNotifications());
     }
   }, [user, dispatch]);
+  
+    // useEffect(() => {
+    //   if ((user, notifications)) {
+    //     dispatch(fetchNotifications());
+    //   }
+    // }, [user, dispatch, notifications]);
 
   return (
     <>
@@ -170,7 +175,6 @@ function App() {
         <Route path="/hooks" element={<UsingHooks />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/connect-wallet" element={<ConnectWallet />} />
         <Route path="/paystack-checkout" element={<PaystackCheckout />} />
         <Route path="/location" element={<LocationSelector />} />
         <Route path="/country" element={<CountrySelect />} />

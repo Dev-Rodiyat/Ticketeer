@@ -10,7 +10,6 @@ import Loader from "../Spinners/Loader";
 import { toast } from "react-toastify";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { toggleThemeMode } from "../../redux/reducers/userSlice";
-import ConnectWallet from "../Wallet/ConnectWallet";
 
 const formatName = (namee) => {
   const name = namee?.split(" ")[0];

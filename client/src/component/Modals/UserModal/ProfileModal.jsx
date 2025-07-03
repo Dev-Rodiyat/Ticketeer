@@ -5,7 +5,6 @@ import { TbTicket } from "react-icons/tb";
 import { FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import ConnectWallet from "../../Wallet/ConnectWallet";
 
 const profileLink = [
   { link: "Profile", route: "/profile" },
@@ -89,7 +88,6 @@ const ProfileModal = ({ onClose, isOpen }) => {
           })}
         </div>
         <div>
-            {/* <ConnectWallet/> */}
           </div>
       </div>
     </div>

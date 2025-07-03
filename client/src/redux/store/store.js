@@ -5,7 +5,6 @@ import storage from "redux-persist/lib/storage";
 import userReducer from "../reducers/userSlice";
 import eventReducer from "./../reducers/eventSlice";
 import locationReducer from "./../reducers/locationSlice";
-import walletReducer from "./../reducers/walletSlice";
 
 const persistConfig = {
   key: "root",
@@ -20,7 +19,6 @@ export const store = configureStore({
     user: persistedUserReducer,
     events: eventReducer,
     location: locationReducer,
-    wallet: walletReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(logger),
