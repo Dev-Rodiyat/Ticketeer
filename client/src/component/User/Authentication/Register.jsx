@@ -80,14 +80,15 @@ const Register = () => {
     return;
   };
 
-  if(loading.register) {
-    return <Loader loading={loading.register}/>
+  if (loading.register) {
+    return <Loader loading={loading.register} />
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 md:py-10 bg-orange-50 dark:bg-zinc-900 transition-all duration-300">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row items-stretch justify-center bg-white dark:bg-zinc-800 rounded-2xl shadow-lg overflow-hidden min-h-[600px]">
+    <div className="min-h-screen flex items-center justify-center py-6 sm:py-8 md:py-10 bg-orange-50 dark:bg-zinc-900 transition-all duration-300">
+      <div className="w-full max-w-7xl px-4">
+        <div className="flex flex-col lg:flex-row items-stretch justify-center bg-white dark:bg-zinc-800 rounded-2xl shadow-lg overflow-hidden">
+
           {/* Image Section */}
           <div className="hidden lg:flex lg:w-1/2">
             <img
@@ -98,26 +99,23 @@ const Register = () => {
           </div>
 
           {/* Form Section */}
-          <div className="w-full lg:w-1/2 px-6 lg:px-10 py-8 flex flex-col justify-center">
+          <div className="w-full lg:w-1/2 px-4 sm:px-6 md:px-8 lg:px-10 py-8 flex flex-col justify-center">
             <div className="text-center flex flex-col gap-2">
-              <h1 className="text-2xl md:text-3xl font-bold font-merriweather dark:text-white">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold font-merriweather dark:text-white">
                 Get Ready to Experience More!
               </h1>
-              <p className="font-inter text-gray-600 dark:text-gray-300">
+              <p className="font-inter text-sm sm:text-base text-gray-600 dark:text-gray-300">
                 Sign up and unlock access to the best events near you.
               </p>
             </div>
 
             <form
               onSubmit={handleSubmit}
-              className="mt-6 max-w-md mx-auto flex flex-col gap-4 font-inter"
+              className="mt-6 w-full max-w-md mx-auto flex flex-col gap-4 font-inter"
             >
               {/* Full Name */}
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="name"
-                  className="font-medium pl-1 dark:text-white"
-                >
+                <label htmlFor="name" className="font-medium pl-1 dark:text-white">
                   Full Name
                 </label>
                 <input
@@ -134,10 +132,7 @@ const Register = () => {
 
               {/* Email */}
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="email"
-                  className="font-medium pl-1 dark:text-white"
-                >
+                <label htmlFor="email" className="font-medium pl-1 dark:text-white">
                   Email
                 </label>
                 <input
@@ -154,10 +149,7 @@ const Register = () => {
 
               {/* Password */}
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="password"
-                  className="font-medium pl-1 dark:text-white"
-                >
+                <label htmlFor="password" className="font-medium pl-1 dark:text-white">
                   Password
                 </label>
                 <PasswordInput
@@ -173,10 +165,7 @@ const Register = () => {
 
               {/* Confirm Password */}
               <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="confirmPassword"
-                  className="font-medium pl-1 dark:text-white"
-                >
+                <label htmlFor="confirmPassword" className="font-medium pl-1 dark:text-white">
                   Confirm Password
                 </label>
                 <PasswordInput
@@ -192,7 +181,6 @@ const Register = () => {
               </div>
 
               {/* Error messages */}
-              {/* {error && <p className="text-red-500 text-sm">{error}</p>} */}
               {passwordStrengthError && (
                 <p className="text-red-500 text-sm">{passwordStrengthError}</p>
               )}
@@ -204,11 +192,10 @@ const Register = () => {
               <div className="flex flex-col gap-4 items-center mt-2">
                 <button
                   type="submit"
-                  className={`py-3 px-6 w-full md:w-2/3 font-medium rounded-full text-white transition-all duration-300 ${
-                    loading.register
+                  className={`py-3 px-6 w-full sm:w-2/3 font-medium rounded-full text-white transition-all duration-300 ${loading.register
                       ? "bg-orange-400 hover:bg-orange-500"
                       : "bg-orange-300 cursor-not-allowed"
-                  }`}
+                    }`}
                   disabled={loading.register}
                 >
                   {loading.register ? "Creating Account..." : "Create Account"}
@@ -218,7 +205,7 @@ const Register = () => {
 
                 <GoogleAuth />
 
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
                   Already have an account?{" "}
                   <Link to="/login" className="text-orange-400 hover:underline">
                     Login

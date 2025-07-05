@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../Spinners/Loader";
 import { FaArrowLeft } from "react-icons/fa";
 
+const CLIENT_URL = import.meta.env.VITE_CLIENT_URL
+
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString("en-US", {
     weekday: "long",
@@ -47,7 +49,7 @@ const TicketPage = () => {
     ticket;
 
   // console.log({ qrCode });
-  const checkInUrl = `http://localhost:5173/checkin/${ticket._id}`;
+  const checkInUrl = `${CLIENT_URL}/checkin/${ticket._id}`;
 
   const handleBack = () => {
     navigate(location.state?.from || "/my-tickets" || "/dashboard");
