@@ -8,12 +8,9 @@ import { toast } from "react-toastify";
 import { logout } from "../../redux/reducers/userSlice";
 import { getUpcomingEvents } from "../../redux/reducers/eventSlice";
 
-// const userEvents = ''
-
 const Dashboard = () => {
   const dispatch = useDispatch();
 
-  // ✅ Get user state
   const {
     user,
     isAuthenticated,
