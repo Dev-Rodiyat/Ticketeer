@@ -156,7 +156,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
 
-    if (!isMatch) { 
+    if (!isMatch) {
       return res.status(400).json({ message: "Invalid Credentials" });
     }
 
@@ -184,7 +184,7 @@ const loginUser = asyncHandler(async (req, res) => {
       themeMode
     });
 
-    
+
   } catch (error) {
     console.log("Error during login process:", error);
     return res.status(500).json({ message: error.message });
@@ -198,7 +198,7 @@ const googleLogin = asyncHandler(async (req, res) => {
     if (!token) {
       return res.status(400).json({ message: "Google token is required" });
     }
-    
+
     // Verify the Google ID token
     const ticket = await client.verifyIdToken({
       idToken: token,
@@ -209,7 +209,7 @@ const googleLogin = asyncHandler(async (req, res) => {
     const email = payload.email;
 
     let user = await User.findOne({ email }).populate("photo");
-    
+
     if (!user) {
       // Create new user
       user = new User({
@@ -231,7 +231,7 @@ const googleLogin = asyncHandler(async (req, res) => {
       }
 
       await user.save();
-      await user.populate("photo");      
+      await user.populate("photo");
     }
 
     // Generate JWT
@@ -823,6 +823,7 @@ const loginStatus = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   try {
     const userId = req.userId;
+
     const {
       oldPassword,
       password,
@@ -834,21 +835,16 @@ const updateUser = asyncHandler(async (req, res) => {
     } = req.body;
 
     const user = await User.findById(userId).populate("photo");
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
-    }
-
-    if (user._id.toString() !== userId) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to update this user" });
     }
 
     const oldName = user.name;
     const hadCustomPhoto = user.photo?.cloudinaryId ? true : false;
     const oldCloudinaryId = user.photo?.cloudinaryId;
 
-    // Handle Password Change
+    // 🔐 Handle Password Update
     if (oldPassword && password) {
       const passwordIsCorrect = await bcrypt.compare(
         oldPassword,
@@ -860,26 +856,34 @@ const updateUser = asyncHandler(async (req, res) => {
       user.password = password;
     }
 
-    // Update Fields
+    // 📝 Update Basic Info
     if (name) user.name = name;
     if (location) user.location = location;
     if (interests) user.interests = interests;
 
     if (socialMediaLinks) {
       user.socialMediaLinks = {
-        ...user.socialMediaLinks.toObject(),
+        ...user.socialMediaLinks.toObject?.() || {},
         ...socialMediaLinks,
       };
     }
 
-    // Handle Photo Update or Removal
+    // 🖼️ Handle Profile Photo
     if (photo) {
-      const photoDoc = user.photo;
+      let photoDoc = user.photo;
+
+      if (!photoDoc) {
+        // create a photo doc if one doesn't exist
+        photoDoc = await ProfilePicture.create({
+          userId: user._id,
+        });
+        user.photo = photoDoc._id;
+      }
 
       const newCloudinaryId = photo.cloudinaryId || null;
       const photoWasDeleted = hadCustomPhoto && !newCloudinaryId;
 
-      // If user deleted uploaded photo -> remove from Cloudinary
+      // 🚫 If user deleted custom photo, remove it from Cloudinary
       if (photoWasDeleted && oldCloudinaryId) {
         await cloudinary.uploader.destroy(oldCloudinaryId);
       }
@@ -890,7 +894,7 @@ const updateUser = asyncHandler(async (req, res) => {
       photoDoc.uploadedAt = new Date();
       await photoDoc.save();
 
-      // If photo was removed, regenerate initials-based image
+      // 🔄 If photo was deleted, regenerate initials image
       if (photoWasDeleted) {
         const initials = getInitials(user.name);
         const { h, s, l } = getRandomOrangeShade();
@@ -901,12 +905,16 @@ const updateUser = asyncHandler(async (req, res) => {
 
         await ProfilePicture.findOneAndUpdate(
           { userId: user._id },
-          { imageUrl: newImageUrl, cloudinaryId: null, googleId: null }
+          {
+            imageUrl: newImageUrl,
+            cloudinaryId: null,
+            googleId: null,
+          }
         );
       }
     }
 
-    // Regenerate initials if name changed and no custom image exists
+    // ✏️ If name changed and no custom image, regenerate initials image
     if (
       oldName !== name &&
       (!user.photo || !user.photo.cloudinaryId)
@@ -935,16 +943,17 @@ const updateUser = asyncHandler(async (req, res) => {
       socialMediaLinks: user.socialMediaLinks,
       photo: user.photo
         ? {
-            _id: user.photo._id,
-            userId: user.photo.userId,
-            imageUrl: user.photo.imageUrl,
-            cloudinaryId: user.photo.cloudinaryId,
-            googleId: user.photo.googleId || null,
-            uploadedAt: user.photo.uploadedAt,
-          }
+          _id: user.photo._id,
+          userId: user.photo.userId,
+          imageUrl: user.photo.imageUrl,
+          cloudinaryId: user.photo.cloudinaryId,
+          googleId: user.photo.googleId || null,
+          uploadedAt: user.photo.uploadedAt,
+        }
         : null,
     });
 
+    // 📧 Send notification email
     await sendUserUpdateMail({ name: user.name, email: user.email });
   } catch (error) {
     console.error("Error updating user:", error);
@@ -953,40 +962,30 @@ const updateUser = asyncHandler(async (req, res) => {
 });
 
 const deleteUser = asyncHandler(async (req, res) => {
-  try {
-    const userId = req.userId; // Get ID from authenticated user
-    const user = await User.findById(userId);
+  const userId = req.userId; // Authenticated user's ID
+  const user = await User.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (user._id.toString() !== userId) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized to delete this user" });
-    }
-
-    // Store user details for mail before deletion
-    const { name, email } = user;
-
-    // Delete all events created by this user
-    await Event.deleteMany({ organizer: userId });
-    await ProfilePicture.deleteOne({ userId: userId });
-
-    // Delete user
-    await user.deleteOne();
-
-    // Send email *after* successful deletion
-    await sendUserDeleteMail({ name, email });
-
-    res.status(200).json({
-      message: "Account and associated events deleted successfully",
-    });
-  } catch (error) {
-    console.error("Error deleting user and events:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
   }
+
+  // Optional: authorization check if admins can delete others
+  if (user._id.toString() !== userId) {
+    return res.status(403).json({ message: "Not authorized to delete this user" });
+  }
+
+  // Save details for email before deletion
+  const { name, email } = user;
+
+  // Deleting the user (this triggers all cascade deletions in pre('deleteOne'))
+  await user.deleteOne(); // Triggers the hook
+
+  // Send goodbye email
+  await sendUserDeleteMail({ name, email });
+
+  res.status(200).json({
+    message: "Account and all associated data deleted successfully",
+  });
 });
 
 const getUserBookedEvents = async (req, res) => {

@@ -93,12 +93,12 @@ const CreateEvent = () => {
     ...data,
     location: locationIsComplete(data.location)
       ? [
-          data.location.address,
-          data.location.country,
-          data.location.state,
-          data.location.city,
-          data.location.venueName,
-        ]
+        data.location.address,
+        data.location.country,
+        data.location.state,
+        data.location.city,
+        data.location.venueName,
+      ]
       : [], // empty if not provided
     meetLink: data.meetLink.trim() || "", // empty string if not provided
   });
@@ -236,6 +236,7 @@ const CreateEvent = () => {
                     className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3"
                     onChange={handleInputChange}
                     value={eventData.startDate}
+                    min={new Date().toISOString().split("T")[0]}
                     required
                   />
                   <input
@@ -261,6 +262,7 @@ const CreateEvent = () => {
                     className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3"
                     onChange={handleInputChange}
                     value={eventData.endDate}
+                    min={new Date().toISOString().split("T")[0]}
                     required
                   />
                   <input
@@ -298,8 +300,8 @@ const CreateEvent = () => {
                     field === "country"
                       ? getOptions(countries)
                       : field === "state"
-                      ? getOptions(states)
-                      : getOptions(cities);
+                        ? getOptions(states)
+                        : getOptions(cities);
 
                   const isDisabled =
                     (field === "state" && !eventData.location.country) ||

@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../../../redux/reducers/userSlice";
 import GoogleAuth from "./GoogleAuth";
 import Loader from "../../Spinners/Loader";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -67,10 +68,16 @@ const Register = () => {
 
     const { confirmPassword, ...dataToSend } = formData; // ✅ Remove confirmPassword before sending
 
-    const resultAction = await dispatch(registerUser(dataToSend));
+    try {
+      const resultAction = await dispatch(registerUser(dataToSend));
 
-    if (registerUser.fulfilled.match(resultAction)) {
-      navigate("/dashboard");
+      if (registerUser.fulfilled.match(resultAction)) {
+        navigate("/dashboard");
+      }
+      toast.success('Registration successful')
+    } catch (error) {
+      toast.error(err || 'Failed to create an acount')
+      console.error(err || 'Failed to create an acount')
     }
   };
 
@@ -193,12 +200,17 @@ const Register = () => {
                 <button
                   type="submit"
                   className={`py-3 px-6 w-full sm:w-2/3 font-medium rounded-full text-white transition-all duration-300 ${loading.register
-                      ? "bg-orange-400 hover:bg-orange-500"
-                      : "bg-orange-300 cursor-not-allowed"
+                    ? "bg-orange-400 hover:bg-orange-500 cursor-not-allowed"
+                    : "bg-orange-500 hover:bg-orange-600 cursor-pointer"
                     }`}
                   disabled={loading.register}
                 >
-                  {loading.register ? "Creating Account..." : "Create Account"}
+                  {loading.register ?
+                    <>
+                      <ClipLoader />
+                      Creating Account...
+                    </>
+                    : "Create Account"}
                 </button>
 
                 <p className="font-bold text-lg dark:text-white">OR</p>

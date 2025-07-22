@@ -28,8 +28,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-
-
 // cron.schedule('0 0 * * *', () => {
 //   console.log('Sending event reminder emails...');
 //   createEventReminderMail();
@@ -38,7 +36,7 @@ app.use(cookieParser());
 // CORS setup
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'https://ticketeer-event.vercel.app'],
+    origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'https://ticketeer-event.vercel.app', "https://test-ivory-nine-50.vercel.app"],
     credentials: true,
     methods: "GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS",
   })

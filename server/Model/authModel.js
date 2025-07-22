@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const { Event, Ticket } = require("./eventModel");
+const Notification = require("./notificationModel");
 
 const DEFAULT_IMAGE_URL = process.env.DEFAULT_IMAGE_URL
 
@@ -96,6 +98,24 @@ userSchema.pre("save", async function (next) {
   const hashedPassword = await bcrypt.hash(this.password, salt);
   this.password = hashedPassword;
   next();
+});
+
+userSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
+  const userId = this._id;
+
+  try {
+    await Event.deleteMany({ organizer: userId });
+    await Ticket.deleteMany({ createdBy: userId });
+    await Ticket.deleteMany({ user: userId });
+    await Notification.deleteMany({
+      $or: [{ sender: userId }, { receiver: userId }],
+    });
+    await ProfilePicture.deleteMany({ userId });
+
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 const ProfilePicture = mongoose.model("ProfilePicture", ProfilePictureSchema);

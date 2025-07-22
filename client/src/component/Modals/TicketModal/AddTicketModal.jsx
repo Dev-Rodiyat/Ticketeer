@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../../utils/api";
 import Loader from "../../Spinners/Loader";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const AddTicketModal = ({ isOpen, onClose, event, getEventDetails }) => {
   console.log(getEventDetails);
@@ -19,9 +20,34 @@ const AddTicketModal = ({ isOpen, onClose, event, getEventDetails }) => {
   const [error, setError] = useState("");
   const [ticket, setTicket] = useState([]);
 
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setTicketData((prev) => ({ ...prev, [name]: value }));
+  //   setError("");
+  // };
+
+  const formatNumberWithCommas = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setTicketData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "price") {
+      const raw = value.replace(/,/g, ""); // remove commas
+      if (!/^\d*$/.test(raw)) return; // allow only digits
+      setTicketData((prev) => ({
+        ...prev,
+        price: formatNumberWithCommas(raw),
+      }));
+    } else if (name === "totalQuantity") {
+      // Prevent letters
+      if (!/^\d*$/.test(value)) return;
+      setTicketData((prev) => ({ ...prev, totalQuantity: value }));
+    } else {
+      setTicketData((prev) => ({ ...prev, [name]: value }));
+    }
+
     setError("");
   };
 
@@ -41,10 +67,11 @@ const AddTicketModal = ({ isOpen, onClose, event, getEventDetails }) => {
     try {
       const response = await api.post(
         `/event/create-ticket/${eventId}`,
-        ticketData,
         {
-          withCredentials: true,
-        }
+          ...ticketData,
+          price: ticketData.price.replace(/,/g, ""), // send raw price to backend
+        },
+        { withCredentials: true }
       );
 
       if (response?.data) {
@@ -120,7 +147,11 @@ const AddTicketModal = ({ isOpen, onClose, event, getEventDetails }) => {
                   Add Ticket Type
                 </Dialog.Title>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-4"
+                  style={{ pointerEvents: loading ? "none" : "auto", opacity: loading ? 0.6 : 1 }}
+                >
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Ticket Name
@@ -131,7 +162,9 @@ const AddTicketModal = ({ isOpen, onClose, event, getEventDetails }) => {
                       required
                       value={ticketData.type}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#2a2a2a] px-3 py-2 text-sm text-gray-900 dark:text-white"
+                      disabled={loading}
+                      className={`mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#2a2a2a] px-3 py-2 text-sm text-gray-900 dark:text-white ${loading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                     />
                   </div>
 
@@ -140,12 +173,15 @@ const AddTicketModal = ({ isOpen, onClose, event, getEventDetails }) => {
                       Price (₦)
                     </label>
                     <input
-                      type="number"
+                      type="text" // ✅ changed from number to text
                       name="price"
                       required
                       value={ticketData.price}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#2a2a2a] px-3 py-2 text-sm text-gray-900 dark:text-white"
+                      disabled={loading}
+                      inputMode="numeric" // ✅ helps mobile keyboards show numbers
+                      className={`mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#2a2a2a] px-3 py-2 text-sm text-gray-900 dark:text-white ${loading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                     />
                   </div>
 
@@ -159,7 +195,9 @@ const AddTicketModal = ({ isOpen, onClose, event, getEventDetails }) => {
                       required
                       value={ticketData.totalQuantity}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#2a2a2a] px-3 py-2 text-sm text-gray-900 dark:text-white"
+                      disabled={loading}
+                      className={`mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#2a2a2a] px-3 py-2 text-sm text-gray-900 dark:text-white ${loading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                     />
                   </div>
 
@@ -167,39 +205,17 @@ const AddTicketModal = ({ isOpen, onClose, event, getEventDetails }) => {
                     <button
                       type="submit"
                       disabled={loading}
-                      className={`${
-                        loading
-                          ? "bg-orange-400 cursor-not-allowed"
-                          : "bg-orange-600 hover:bg-orange-700"
-                      } text-white px-4 py-2 rounded-full text-sm flex items-center gap-2`}
+                      className={`${loading
+                        ? "bg-orange-400 cursor-not-allowed"
+                        : "bg-orange-600 hover:bg-orange-700"
+                        } text-white px-4 py-2 rounded-full text-sm flex items-center gap-2`}
                     >
-                      {loading ? (
+                      {loading ?
                         <>
-                          <svg
-                            className="animate-spin h-4 w-4 text-white"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8v4l3.536-3.536a1 1 0 10-1.414-1.414L12 4.586V0a12 12 0 00-8 20.485l1.414-1.414A9.959 9.959 0 014 12z"
-                            />
-                          </svg>
+                          <ClipLoader size={20} color="#fff" />
                           Creating...
                         </>
-                      ) : (
-                        "Create Ticket"
-                      )}
+                        : "Create Ticket"}
                     </button>
                   </div>
                 </form>

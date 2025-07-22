@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import EventDetails from "../Event/EventDetails";
 import { IoLocationOutline, IoVideocamOutline } from "react-icons/io5";
 import Loader from "../Spinners/Loader";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -38,7 +39,8 @@ const CreateTicket = () => {
   const { eventId } = useParams();
   const [ticketData, setTicketData] = useState({
     type: "",
-    price: "",
+    price: "", // This is the raw number
+    formattedPrice: "", // This is what appears in the input with commas
     totalQuantity: "",
     description: "",
   });
@@ -81,6 +83,23 @@ const CreateTicket = () => {
     setError(""); // Clear the error when the user types
   };
 
+  const handlePriceChange = (e) => {
+    const rawValue = e.target.value.replace(/[^\d]/g, ""); // Remove non-digits
+    const formatted = formatNumberWithCommas(rawValue);
+
+    setTicketData((prev) => ({
+      ...prev,
+      price: rawValue, // raw for backend
+      formattedPrice: formatted, // display with commas
+    }));
+  };
+
+  const formatNumberWithCommas = (value) => {
+    const number = parseInt(value.replace(/,/g, ""), 10);
+    if (isNaN(number)) return "";
+    return number.toLocaleString("en-NG");
+  };
+
   const createTicket = async () => {
     if (event?.ticketTypes.length >= 5) {
       toast.error("You can only add up to 5 ticket types per event.");
@@ -93,6 +112,7 @@ const CreateTicket = () => {
       return; // Prevent further execution
     }
     try {
+      setIsSubmitting(true);
       const response = await axios.post(
         `${SERVER_URL}/event/create-ticket/${eventId}`,
         ticketData,
@@ -167,9 +187,9 @@ const CreateTicket = () => {
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 {event?.startDate &&
-                event?.startTime &&
-                event?.endDate &&
-                event?.endTime ? (
+                  event?.startTime &&
+                  event?.endDate &&
+                  event?.endTime ? (
                   <>
                     {formatDate(event.startDate)}, {formatTime(event.startTime)}
                     <br />– {formatDate(event.endDate)}{" "}
@@ -231,7 +251,9 @@ const CreateTicket = () => {
               </p>
             </div>
 
-            <form className="space-y-6">
+            <form className="space-y-6" onKeyDown={(e) => {
+              if (e.key === "Enter") e.preventDefault();
+            }}>
               <div>
                 <label
                   htmlFor="type"
@@ -243,8 +265,9 @@ const CreateTicket = () => {
                   type="text"
                   id="type"
                   name="type"
-                  placeholder="General admission"
-                  className="w-full bg-orange-50 dark:bg-neutral-700 border border-orange-400 dark:border-neutral-600 text-gray-900 dark:text-white rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  disabled={isSubmitting}
+                  className={`w-full bg-orange-50 dark:bg-neutral-700 border border-orange-400 dark:border-neutral-600 text-gray-900 dark:text-white rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   required
                   onChange={handleInputChange}
                   value={ticketData.type}
@@ -260,14 +283,18 @@ const CreateTicket = () => {
                     Price (₦)
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     id="price"
                     name="price"
-                    placeholder="e.g. 20"
-                    className="w-full bg-orange-50 dark:bg-neutral-700 border border-orange-400 dark:border-neutral-600 text-gray-900 dark:text-white rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    inputMode="numeric"
+                    pattern="\d*"
+                    placeholder="e.g. 2,000"
+                    disabled={isSubmitting}
+                    className={`w-full bg-orange-50 dark:bg-neutral-700 border border-orange-400 dark:border-neutral-600 text-gray-900 dark:text-white rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     required
-                    onChange={handleInputChange}
-                    value={ticketData.price}
+                    onChange={handlePriceChange}
+                    value={ticketData.formattedPrice}
                   />
                 </div>
 
@@ -283,7 +310,9 @@ const CreateTicket = () => {
                     id="totalQuantity"
                     name="totalQuantity"
                     placeholder="e.g. 50"
-                    className="w-full bg-orange-50 dark:bg-neutral-700 border border-orange-400 dark:border-neutral-600 text-gray-900 dark:text-white rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    disabled={isSubmitting}
+                    className={`w-full bg-orange-50 dark:bg-neutral-700 border border-orange-400 dark:border-neutral-600 text-gray-900 dark:text-white rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     required
                     onChange={handleInputChange}
                     value={ticketData.totalQuantity}
@@ -303,7 +332,9 @@ const CreateTicket = () => {
                   name="description"
                   placeholder="Description"
                   rows="4"
-                  className="w-full bg-orange-50 dark:bg-neutral-700 border border-orange-400 dark:border-neutral-600 text-gray-900 dark:text-white rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  disabled={isSubmitting}
+                  className={`w-full bg-orange-50 dark:bg-neutral-700 border border-orange-400 dark:border-neutral-600 text-gray-900 dark:text-white rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-orange-400 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   onChange={handleInputChange}
                   value={ticketData.description}
                 />
@@ -343,9 +374,18 @@ const CreateTicket = () => {
             <button
               onClick={handleSubmit}
               aria-label="Create event"
-              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-full transition"
+              className={`bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-full transition flex items-center justify-center w-[120px] h-[48px] ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              disabled={isSubmitting}
             >
-              Create
+              {isSubmitting ? (
+                <>
+                  <ClipLoader size={24} color="#fff" />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
             </button>
           </div>
         </div>
