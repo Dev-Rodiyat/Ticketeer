@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import PastEvents from "../EventView/PastEvents";
 import FavouriteEvents from "../EventView/FavouriteEvents";
 import UpcomingEvents from "../EventView/UpcomingEvents";
@@ -18,20 +18,11 @@ const buttonVariants = {
 const tabList = ["upcoming", "past", "favorites"];
 
 const EventTabs = () => {
-  const [activeTab, setActiveTab] = useState("upcoming");
+  const [activeTab, setActiveTab] = useState("upcoming"); // default tab
 
-  // Load saved tab from localStorage on mount
-  useEffect(() => {
-    const savedTab = localStorage.getItem("activeEventTab");
-    if (savedTab && tabList.includes(savedTab)) {
-      setActiveTab(savedTab);
-    }
-  }, []);
-
-  // Save tab to localStorage on change
+  // Just update state, no localStorage
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    localStorage.setItem("activeEventTab", tab);
   };
 
   return (

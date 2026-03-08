@@ -25,12 +25,7 @@ const protectUser = asyncHandler(async (req, res, next) => {
       if (!foundUser) {
         return res.status(401).json({ message: "Unauthorized, user not found" });
       }
-
-      // Check if user is suspended
-      if (foundUser.role === "suspended") {
-        return res.status(403).json({ message: "User suspended, please contact support" });
-      }
-
+      
       // Attach user to request
       req.user = foundUser;
       next();

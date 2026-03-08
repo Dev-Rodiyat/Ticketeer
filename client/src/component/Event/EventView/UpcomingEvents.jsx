@@ -6,6 +6,7 @@ import { getUserUpcomingEvents } from "../../../redux/reducers/eventSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../../Spinners/Loader";
 import { toast } from "react-toastify";
+import { Country, State, City } from 'country-state-city';
 
 const formatTime = (timeString) => {
   const [hours, minutes] = timeString.split(":");
@@ -35,7 +36,7 @@ const UpcomingEvents = ({ countries, states }) => {
   const { userUpcomingEvents, loading, error } = useSelector(
     (state) => state.events
   );
- 
+
   const { user, isAuthenticated } = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -43,6 +44,15 @@ const UpcomingEvents = ({ countries, states }) => {
       dispatch(getUserUpcomingEvents());
     }
   }, [user, isAuthenticated, dispatch]);
+
+  const getCountryName = (code) =>
+    Country.getCountryByCode(code)?.name || code;
+
+  const getStateName = (code, countryCode) =>
+    State.getStatesOfCountry(countryCode)?.find((s) => s.isoCode === code)?.name || code;
+
+  const getCityName = (name, stateCode, countryCode) =>
+    City.getCitiesOfState(countryCode, stateCode)?.find((c) => c.name === name)?.name || name;
 
   if (loading.userUpcomingEvents) {
     return <Loader loading={loading.userUpcomingEvents} />;
@@ -73,7 +83,7 @@ const UpcomingEvents = ({ countries, states }) => {
               <div className="flex flex-col lg:flex-row gap-6 bg-orange-50 dark:bg-zinc-800 bg-opacity-50 rounded-xl p-4">
                 {/* Event Info */}
                 <div className="flex-1 flex flex-col gap-3">
-                  <div>
+                  <div className="space-y-2">
                     <p className="text-base text-zinc-600 dark:text-zinc-300">
                       {formatTime(upcoming.startTime)}
                     </p>
@@ -103,22 +113,24 @@ const UpcomingEvents = ({ countries, states }) => {
                     </p>
                   </div>
 
-                  <div className="flex gap-2 items-center mt-2 text-sm text-zinc-700 dark:text-zinc-300">
-                      <>
-                        <IoVideocamOutline size={18} />
-                        <a
-                          href={upcoming.meetLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 underline"
-                        >
-                          Join Meeting
-                        </a>
-                      </>
-                      <>
-                        <IoLocationOutline size={18} />
-                        <p>{`${upcoming.location[2]}, ${upcoming.location[1]}`}</p>
-                      </>
+                  <div className="flex flex-col gap-3 mt-2 text-sm text-zinc-700 dark:text-zinc-300">
+                    <div className="flex gap-2">
+                      <IoVideocamOutline size={18} />
+                      <a
+                        href={upcoming.meetLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 underline"
+                      >
+                        Join Meeting
+                      </a>
+                    </div>
+                    <div className="flex gap-2">
+                      <IoLocationOutline size={18} />
+                      {getCityName(upcoming.location[3], upcoming.location[2], upcoming.location[1])},{" "}
+                      {getStateName(upcoming.location[2], upcoming.location[1])},{" "}
+                      {getCountryName(upcoming.location[1])}
+                    </div>
                   </div>
 
                   <button
@@ -161,7 +173,7 @@ const UpcomingEvents = ({ countries, states }) => {
                 </Link>
                 <Link to="/create-event">
                   <button className="px-6 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-md text-sm transition">
-                    Create events
+                    Create an event
                   </button>
                 </Link>
               </div>

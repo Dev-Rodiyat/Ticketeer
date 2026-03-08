@@ -11,9 +11,10 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
   const [loading, setLoading] = useState(false);
   const [selectedTickets, setSelectedTickets] = useState({});
 
+  const feeRate = 0.05; // 🔹 define your fee rate once here
+
   if (!tickets || tickets.length === 0) return null;
 
-  // Convert selectedTickets object to array of objects [{ticketTypeId, quantity}]
   const selectedTicketsArray = Object.entries(selectedTickets)
     .filter(([_, qty]) => qty > 0)
     .map(([ticketTypeId, quantity]) => ({ ticketTypeId, quantity }));
@@ -28,10 +29,8 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
       });
       return;
     }
-
     if (!isNaN(parsed)) {
       if (parsed < 1) return;
-
       if (parsed > availableQuantity) {
         setSelectedTickets((prev) => ({
           ...prev,
@@ -50,13 +49,11 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
     return selectedTicketsArray.reduce((sum, { ticketTypeId, quantity }) => {
       const ticket = tickets.find((t) => t._id === ticketTypeId);
       if (!ticket) return sum;
-
-      const fee = ticket.price * 0.02;
+      const fee = ticket.price * feeRate; // 🔹 use feeRate
       return sum + (ticket.price + fee) * quantity;
     }, 0);
   };
 
-  // Instead of selecting one ticket, just pass the full map
   const selectedTicketEntries = selectedTicketsArray.filter(
     ({ quantity }) => quantity > 0
   );
@@ -68,10 +65,8 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
         { eventId: event._id, selectedTickets: selectedTicketsArray },
         { withCredentials: true }
       );
-
-      // If success, proceed to payment
       if (response.status === 200) {
-        proceedToPayment(); // your Paystack or Flutterwave trigger
+        proceedToPayment();
       }
     } catch (error) {
       console.error(error.response?.data || error.message);
@@ -103,7 +98,6 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
           </div>
         ) : (
           <>
-            {/* Ticket Selection */}
             <div className="flex flex-col gap-3">
               {tickets.map((ticket) => (
                 <div
@@ -113,7 +107,11 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
                   <div className="flex flex-col">
                     <p className="font-medium">{ticket.type}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      ₦{(ticket.price * 1.02).toFixed(2)}
+                      ₦
+                      {(ticket.price * (1 + feeRate)).toLocaleString("en-NG", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </p>
 
                     {ticket.availableQuantity === 0 ? (
@@ -122,13 +120,12 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
                       </span>
                     ) : (
                       <p
-                        className={`text-xs ${
-                          ticket.availableQuantity < 10
-                            ? "text-red-500"
-                            : "text-gray-400"
-                        }`}
+                        className={`text-xs ${ticket.availableQuantity < 10
+                          ? "text-red-500"
+                          : "text-gray-400"
+                          }`}
                       >
-                        {ticket.availableQuantity} ticket
+                        {ticket.availableQuantity.toLocaleString()} ticket
                         {ticket.availableQuantity > 1 && "s"} left
                       </p>
                     )}
@@ -147,17 +144,15 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
                       )
                     }
                     disabled={ticket.availableQuantity === 0}
-                    className={`w-16 px-2 py-1 border rounded text-right bg-white dark:bg-zinc-800 ${
-                      ticket.availableQuantity === 0
-                        ? "cursor-not-allowed bg-zinc-200 dark:bg-zinc-700 text-zinc-400"
-                        : "border-zinc-300 dark:border-zinc-600"
-                    }`}
+                    className={`w-16 px-2 py-1 border rounded text-right bg-white dark:bg-zinc-800 ${ticket.availableQuantity === 0
+                      ? "cursor-not-allowed bg-zinc-200 dark:bg-zinc-700 text-zinc-400"
+                      : "border-zinc-300 dark:border-zinc-600"
+                      }`}
                   />
                 </div>
               ))}
             </div>
 
-            {/* Payment Section */}
             <div className="mt-3">
               <p className="text-sm font-semibold mb-1">Choose Payment Method:</p>
               <div className="flex gap-3 text-xs">
@@ -168,6 +163,7 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
                     value="paystack"
                     onChange={(e) => setSelectedPayment(e.target.value)}
                     checked={selectedPayment === "paystack"}
+                    className="cursor-pointer"
                   />
                   Paystack
                 </label>
@@ -178,19 +174,19 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
                     value="flutterwave"
                     onChange={(e) => setSelectedPayment(e.target.value)}
                     checked={selectedPayment === "flutterwave"}
+                    className="cursor-pointer"
                   />
                   Flutterwave
                 </label>
               </div>
             </div>
 
-            {/* Payment Components */}
             {selectedPayment === "flutterwave" &&
               selectedTicketEntries.length > 0 && (
                 <UsingHooks
                   user={user}
                   event={event}
-                  selectedTickets={selectedTicketsArray} // updated to array
+                  selectedTickets={selectedTicketsArray}
                   tickets={tickets}
                 />
               )}
@@ -199,20 +195,25 @@ const PurchaseTicketModal = ({ onClose, tickets, event, user }) => {
                 <PaystackCheckout
                   user={user}
                   event={event}
-                  selectedTickets={selectedTicketsArray} // updated to array
+                  selectedTickets={selectedTicketsArray}
                   tickets={tickets}
                 />
               )}
 
-            {/* Summary */}
             <div className="mt-3 text-sm">
               <div className="flex justify-between border-t border-zinc-300 pt-2 mt-2 font-medium">
                 <span>Total:</span>
-                <span>₦{calculateTotal().toFixed(2)}</span>
+                <span>
+                  {selectedTicketEntries.length === 0
+                    ? "—"
+                    : `₦${calculateTotal().toLocaleString("en-NG", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}`}
+                </span>
               </div>
             </div>
 
-            {/* Loader */}
             {loading && (
               <div className="mt-4 flex justify-center">
                 <Loader />

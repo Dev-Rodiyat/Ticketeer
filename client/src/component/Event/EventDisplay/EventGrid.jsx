@@ -106,7 +106,7 @@ const EventGrid = ({ events }) => {
                     <p className="text-sm">{formatDate(event.startDate)}</p>
                   </div>
                   <div className="flex justify-center items-center bg-orange-400 text-white font-bold rounded-md h-10 w-12 text-center text-sm">
-                    {event?.ticketTypes.map((pr) => pr.price)}
+                    {event?.limit}
                   </div>
                 </div>
               </div>

@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { TbTicket } from "react-icons/tb";
 import Loader from "../Spinners/Loader";
 import { toast } from "react-toastify";
+import { Country, State, City } from "country-state-city";
 import {
   getEventDetails,
   getUserTickets,
@@ -118,6 +119,15 @@ const EventView = () => {
     return toast.error(error || "Unable to get event details");
   }
 
+  const getCountryName = (code) =>
+    Country.getCountryByCode(code)?.name || code;
+
+  const getStateName = (code, countryCode) =>
+    State.getStatesOfCountry(countryCode)?.find((s) => s.isoCode === code)?.name || code;
+
+  const getCityName = (name, stateCode, countryCode) =>
+    City.getCitiesOfState(countryCode, stateCode)?.find((c) => c.name === name)?.name || name;
+
   const startDate = new Date(eventDetails.startDate);
 
   const formattedMonth = startDate
@@ -163,9 +173,8 @@ const EventView = () => {
         </button>
 
         <div className="flex flex-col lg:flex-row gap-10">
-          {/* Left Column */}
+
           <div className="flex flex-col gap-6 w-full lg:w-[400px]">
-            {/* Image */}
             <div className="relative w-full h-60 sm:h-72 bg-white dark:bg-zinc-800 rounded-lg overflow-hidden shadow-md">
               <img
                 src={eventDetails?.image?.imageUrl}
@@ -173,18 +182,16 @@ const EventView = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* Info Cards */}
 
             {[
               ["Host", eventDetails?.organizer?.name, null],
               [
                 "Attending",
                 attendees.length > 0
-                  ? `${attendees[0]?.name}${
-                      attendees.length > 1
-                        ? ` (and ${attendees.length - 1} others)`
-                        : ""
-                    }`
+                  ? `${attendees[0]?.name}${attendees.length > 1
+                    ? ` (and ${attendees.length - 1} others)`
+                    : ""
+                  }`
                   : "No attendees yet",
                 openAttendeeModal,
               ],
@@ -200,7 +207,6 @@ const EventView = () => {
 
                 {label === "Host" ? (
                   <div className="flex gap-3">
-                    {/* Organizer avatar and name */}
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         {eventDetails?.organizer?.photo?.imageUrl && (
@@ -219,7 +225,6 @@ const EventView = () => {
                       </p>
                     </div>
 
-                    {/* Social links (conditionally rendered) */}
                     <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-300">
                       {eventDetails?.organizer?.socialMediaLinks?.x && (
                         <a
@@ -278,9 +283,8 @@ const EventView = () => {
                   </div>
                 ) : (
                   <p
-                    className={`text-base font-medium ${
-                      onClick ? "cursor-pointer hover:underline" : ""
-                    }`}
+                    className={`text-base font-medium ${onClick ? "cursor-pointer hover:underline" : ""
+                      }`}
                     onClick={onClick}
                   >
                     {value}
@@ -290,16 +294,14 @@ const EventView = () => {
             ))}
           </div>
 
-          {/* Right Column */}
           <div className="flex flex-col gap-6 w-full">
-            {/* Title & Info */}
+
             <div className="flex flex-col gap-6">
               <h2 className="md:text-4xl text-2xl font-bold">
                 {eventDetails.title}
               </h2>
 
               <div className="flex flex-col gap-4">
-                {/* Date/Time */}
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-lg border dark:border-zinc-600 shadow-sm flex flex-col overflow-hidden">
                     <div className="bg-orange-600 text-white text-xs py-1 text-center font-semibold uppercase">
@@ -319,47 +321,41 @@ const EventView = () => {
                   </div>
                 </div>
 
-                {/* Location / Link */}
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-lg border dark:border-zinc-600 shadow-sm flex flex-col overflow-hidden items-center justify-center">
-                      <IoVideocamOutline size={30} />
-                    </div>
-                    <div className="flex flex-col">
-                      <p className="text-sm md:text-lg font-semibold">
-                        View Link
-                      </p>
-                      <a
-                        href={eventDetails.meetLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-500 underline flex flex-col gap-1 w-full"
-                      >
-                        Join Meeting
-                      </a>
-                    </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-lg border dark:border-zinc-600 shadow-sm flex flex-col overflow-hidden items-center justify-center">
+                    <IoVideocamOutline size={30} />
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-lg border dark:border-zinc-600 shadow-sm flex flex-col overflow-hidden items-center justify-center">
-                      <IoLocationOutline size={30} />
-                    </div>
-                    <div className="flex flex-col">
-                      <p className="text-sm md:text-lg font-semibold">
-                        {/* View Location */}
-                        {eventDetails &&
-                          eventDetails.location &&
-                          `${eventDetails.location[2]}, ${eventDetails.location[1]}.`}
-                      </p>
-                      <p className="text-xs md:text-sm text-gray-500 dark:text-zinc-400">
-                        {eventDetails &&
-                          eventDetails.location &&
-                          `${eventDetails.location[0]}, ${eventDetails.location[4]}, ${eventDetails.location[3]}.`}
-                      </p>
-                    </div>
+                  <div className="flex flex-col">
+                    <p className="text-sm md:text-lg font-semibold">
+                      View Link
+                    </p>
+                    <a
+                      href={eventDetails?.meetLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-500 underline flex flex-col gap-1 w-full"
+                    >
+                      Join Meeting
+                    </a>
                   </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-lg border dark:border-zinc-600 shadow-sm flex flex-col overflow-hidden items-center justify-center">
+                    <IoLocationOutline size={30} />
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-sm md:text-lg font-semibold">
+                      {eventDetails?.location &&
+                        `${getStateName(eventDetails.location[2], eventDetails.location[1])}, ${getCountryName(eventDetails.location[1])}.`}
+                    </p>
+                    <p className="text-xs md:text-sm text-gray-500 dark:text-zinc-400">
+                      {eventDetails?.location &&
+                        `${eventDetails.location[0]}, ${eventDetails.location[4]}, ${eventDetails.location[3]}.`}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Registration / Confirmation */}
 
             <div className="flex flex-col gap-4 px-4 md:px-6 py-5 bg-orange-300 bg-opacity-50 dark:bg-zinc-900/20 border dark:border-zinc-700 shadow-sm rounded-xl">
               <p className="text-xl font-semibold">Register to Join</p>
@@ -412,7 +408,6 @@ const EventView = () => {
               )}
             </div>
 
-            {/* About Event */}
             <div className="flex flex-col gap-2 px-6 py-4 bg-orange-300 bg-opacity-50 dark:bg-zinc-900/20 border dark:border-zinc-700 shadow-sm rounded-xl">
               <h3 className="text-sm font-semibold text-gray-500 dark:text-zinc-400">
                 About the Event
@@ -427,7 +422,6 @@ const EventView = () => {
         </div>
       </div>
 
-      {/* Modals */}
       {shareModalOpen && (
         <EventShareModal
           onClose={closeShareModal}
@@ -452,7 +446,7 @@ const EventView = () => {
       {ticketModalOpen && (
         <Ticket
           onClose={closeTicketModal}
-          // ticket={ticket}
+        // ticket={ticket}
         />
       )}
       {/* {console.log({ticket})} */}

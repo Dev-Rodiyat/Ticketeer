@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserPastEvents } from "../../../redux/reducers/eventSlice";
 import Loader from "../../Spinners/Loader";
 import { toast } from "react-toastify";
+import { Country, State, City } from 'country-state-city';
 
 const formatTime = (timeString) => {
   const [hours, minutes] = timeString.split(":"); // Split "HH:mm" format
@@ -37,10 +38,19 @@ const PastEvents = () => {
   const { user, isAuthenticated } = useSelector((state) => state.user);
 
   useEffect(() => {
-   if(user && isAuthenticated) {
-    dispatch(getUserPastEvents());
-   }
+    if (user && isAuthenticated) {
+      dispatch(getUserPastEvents());
+    }
   }, [dispatch, user, isAuthenticated]);
+
+  const getCountryName = (code) =>
+    Country.getCountryByCode(code)?.name || code;
+
+  const getStateName = (code, countryCode) =>
+    State.getStatesOfCountry(countryCode)?.find((s) => s.isoCode === code)?.name || code;
+
+  const getCityName = (name, stateCode, countryCode) =>
+    City.getCitiesOfState(countryCode, stateCode)?.find((c) => c.name === name)?.name || name;
 
   if (loading.pastEvents) {
     return <Loader loading={loading.pastEvents} />;
@@ -71,7 +81,7 @@ const PastEvents = () => {
               <div className="flex flex-col lg:flex-row gap-6 bg-orange-50 dark:bg-zinc-800 bg-opacity-50 rounded-xl p-4">
                 {/* Event Info */}
                 <div className="flex-1 flex flex-col gap-3">
-                  <div>
+                  <div className="space-y-2">
                     <p className="text-base text-zinc-600 dark:text-zinc-300">
                       {formatTime(past.startTime)}
                     </p>
@@ -101,22 +111,24 @@ const PastEvents = () => {
                     </p>
                   </div>
 
-                  <div className="flex gap-2 items-center mt-2 text-sm text-zinc-700 dark:text-zinc-300">
-                      <>
-                        <IoVideocamOutline size={18} />
-                        <a
-                          href={past.meetLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 underline"
-                        >
-                          Join Meeting
-                        </a>
-                      </>
-                      <>
-                        <IoLocationOutline size={18} />
-                        <p>{`${past.location[2]}, ${past.location[1]}`}</p>
-                      </>
+                  <div className="flex flex-col gap-3 mt-2 text-sm text-zinc-700 dark:text-zinc-300">
+                    <div className="flex gap-2">
+                      <IoVideocamOutline size={18} />
+                      <a
+                        href={past.meetLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 underline"
+                      >
+                        Join Meeting
+                      </a>
+                    </div>
+                    <div className="flex gap-2">
+                      <IoLocationOutline size={18} />
+                      {getCityName(past.location[3], past.location[2], past.location[1])},{" "}
+                      {getStateName(past.location[2], past.location[1])},{" "}
+                      {getCountryName(past.location[1])}
+                    </div>
                   </div>
 
                   <button

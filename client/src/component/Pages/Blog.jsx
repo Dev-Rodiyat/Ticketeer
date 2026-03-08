@@ -26,7 +26,7 @@ const keyPoints = [
 const Blog = () => {
   const currentYear = new Date().getFullYear();
   const getCurrentYear = () => {
-    return currentYear;
+    return currentYear + 1;
   };
 
   const nextYear = currentYear + 1;

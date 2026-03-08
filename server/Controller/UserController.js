@@ -15,6 +15,12 @@ const crypto = require("crypto");
 const multer = require("multer");
 const { Event, Ticket } = require("../Model/eventModel");
 const {
+  getInitials,
+  getRandomOrangeShade,
+  hslToHex,
+  generateInitialsAvatarUrl,
+} = require("../Utils/avatar");
+const {
   sendUserRegisterMail,
   sendUserLogInMail,
   sendUserUpdateMail,
@@ -24,38 +30,6 @@ const {
 const storage = multer.memoryStorage();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-
-const getInitials = (fullName) => {
-  const names = fullName.trim().split(" ");
-  const initials = names
-    .slice(0, 2)
-    .map((n) => n[0].toUpperCase())
-    .join("");
-  return initials;
-};
-
-const getRandomOrangeShade = () => {
-  const hue = 30; // Orange hue
-  const saturation = Math.floor(Math.random() * 20) + 80; // 80% - 100%
-  const lightness = Math.floor(Math.random() * 20) + 40; // 40% - 60%
-  return { h: hue, s: saturation, l: lightness };
-};
-
-const hslToHex = (h, s, l) => {
-  s /= 100;
-  l /= 100;
-
-  const k = (n) => (n + h / 30) % 12;
-  const a = s * Math.min(l, 1 - l);
-  const f = (n) =>
-    Math.round(
-      255 * (l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1))))
-    )
-      .toString(16)
-      .padStart(2, "0");
-
-  return `${f(0)}${f(8)}${f(4)}`;
-};
 
 const DEFAULT_IMAGE_URL = process.env.DEFAULT_IMAGE_URL;
 // const DEFAULT_IMAGE_URL = `https://via.placeholder.com/150x150?text=${name}`;
@@ -85,16 +59,11 @@ const registerUser = asyncHandler(async (req, res) => {
       password,
     });
 
-    const initials = getInitials(name);
-    const { h, s, l } = getRandomOrangeShade();
-    const bgColor = hslToHex(h, s, l);
-    const textColor = "FFFFFF";
-
-    const DEFAULT_IMAGE_URL = `https://placehold.co/150x150/${bgColor}/${textColor}?text=${initials}&font=inter`;
+    const defaultImageUrl = generateInitialsAvatarUrl(name, "inter");
 
     const defaultProfilePicture = await ProfilePicture.create({
       userId: user._id,
-      imageUrl: DEFAULT_IMAGE_URL,
+      imageUrl: defaultImageUrl,
       cloudinaryId: null,
     });
 
@@ -711,7 +680,7 @@ const getUser = asyncHandler(async (req, res) => {
           {
             path: "eventId",
             select:
-              "title description meetLink category location startDate startTime endDate endTime",
+              "title description meetLink categories location startDate startTime endDate endTime",
           },
           { path: "ticketTypeId", select: "type price description status" },
         ],
@@ -741,7 +710,7 @@ const getUserTickets = asyncHandler(async (req, res) => {
       .populate({
         path: "eventId", // Populate event details related to the ticket
         select:
-          "title description meetLink category location startDate startTime endDate endTime",
+          "title description meetLink categories location startDate startTime endDate endTime",
       })
       .populate({
         path: "ticketTypeId", // Populate ticket type details
@@ -896,12 +865,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
       // 🔄 If photo was deleted, regenerate initials image
       if (photoWasDeleted) {
-        const initials = getInitials(user.name);
-        const { h, s, l } = getRandomOrangeShade();
-        const bgColor = hslToHex(h, s, l);
-        const textColor = "FFFFFF";
-
-        const newImageUrl = `https://placehold.co/150x150/${bgColor}/${textColor}?text=${initials}&font=roboto`;
+        const newImageUrl = generateInitialsAvatarUrl(user.name, "roboto");
 
         await ProfilePicture.findOneAndUpdate(
           { userId: user._id },
@@ -915,16 +879,8 @@ const updateUser = asyncHandler(async (req, res) => {
     }
 
     // ✏️ If name changed and no custom image, regenerate initials image
-    if (
-      oldName !== name &&
-      (!user.photo || !user.photo.cloudinaryId)
-    ) {
-      const initials = getInitials(name);
-      const { h, s, l } = getRandomOrangeShade();
-      const bgColor = hslToHex(h, s, l);
-      const textColor = "FFFFFF";
-
-      const newImageUrl = `https://placehold.co/150x150/${bgColor}/${textColor}?text=${initials}&font=roboto`;
+    if (oldName !== name && (!user.photo || !user.photo.cloudinaryId)) {
+      const newImageUrl = generateInitialsAvatarUrl(name, "roboto");
 
       await ProfilePicture.findOneAndUpdate(
         { userId: user._id },

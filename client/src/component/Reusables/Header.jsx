@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, matchPath } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import Sidebar from "../Reusables/Sidebar";
 import NotificationModal from "../Modals/NotificationModal/NotificationModal";
 import ProfileModal from "../Modals/UserModal/ProfileModal";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,6 +9,7 @@ import Loader from "../Spinners/Loader";
 import { toast } from "react-toastify";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { toggleThemeMode } from "../../redux/reducers/userSlice";
+import Sidebar from "../Layout/Sidebar";
 
 const formatName = (namee) => {
   const name = namee?.split(" ")[0];
@@ -19,13 +19,14 @@ const formatName = (namee) => {
 const navLink = [
   { title: "Home", route: "/dashboard" },
   { title: "Create Event", route: "/create-event" },
-  { title: "Create Ticket", route: "/create-ticket" },
+  { title: "Create Ticket", route: "/create-ticket" }, // matches /create-ticket/:eventId
   { title: "Events", route: "/event-list" },
-  { title: "Manage Event", route: "/manage-event/:eventId" },
+  { title: "Event Details", route: "/event-details/:eventId" },
   { title: "View Event", route: "/view-event/:eventId" },
   { title: "My Events", route: "/my-events" },
   { title: "My Tickets", route: "/my-tickets" },
-  { title: "Tickets", route: "/tickets" },
+  { title: "Ticket Details", route: "/ticket-page/:ticketId" },
+  { title: "Scan Ticket", route: "/scan-ticket" },
   { title: "Settings", route: "/settings" },
   { title: "Profile Update", route: "/settings/profile-update" },
 ];
@@ -62,6 +63,10 @@ const Header = () => {
   const isActive = (route) =>
     matchPath({ path: route, end: false }, location.pathname);
 
+  const activeNavItem =
+    navLink.find(({ route }) => isActive(route)) ||
+    navLink.find(({ route }) => route === "/dashboard");
+
   if (loading.getUser) {
     return <Loader loading={loading.getUser} />;
   }
@@ -69,8 +74,8 @@ const Header = () => {
   return (
     <header className="w-full fixed top-0 left-0 z-30 bg-orange-50 dark:bg-zinc-900 shadow-md font-inter">
       <nav className="flex items-center justify-between px-4 sm:px-6 md:px-10 py-3 sm:py-3 border-b border-orange-200 dark:border-zinc-700 backdrop-blur-md">
-        {/* Left - Menu & Active Link */}
-        <div className="flex items-center gap-2">
+        {/* Left - Menu & Active Route Label */}
+        <div className="flex items-center gap-3">
           <button
             onClick={toggleModal(setModalOpen)}
             className="p-2 rounded-md text-zinc-800 dark:text-zinc-200 hover:bg-orange-200 dark:hover:bg-zinc-800 transition"
@@ -79,22 +84,13 @@ const Header = () => {
             <FiMenu size={22} />
           </button>
 
-          <ul className="hidden sm:flex items-center">
-            {navLink.map(({ route, title }, index) => (
-              <li key={index}>
-                <Link
-                  to={route}
-                  className={`text-sm sm:text-base font-medium transition duration-300 ${
-                    isActive(route)
-                      ? "text-orange-600 dark:text-orange-400"
-                      : "hidden"
-                  }`}
-                >
-                  {title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {activeNavItem && (
+            <div className="hidden sm:flex items-center">
+              <span className="text-sm sm:text-base font-medium text-orange-600 dark:text-orange-400">
+                {activeNavItem.title}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Right - Notification & Profile */}

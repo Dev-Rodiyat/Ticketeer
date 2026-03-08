@@ -9,7 +9,7 @@ const Footer = () => {
 
   return (
     <div>
-  <div className="bg-slate-500 dark:bg-zinc-900 h-80 flex md:flex-row scroll-smooth flex-col items-center justify-evenly text-white dark:text-gray-300">
+  <div className="bg-slate-600 dark:bg-zinc-900 h-80 flex md:flex-row scroll-smooth flex-col items-center justify-evenly text-white dark:text-gray-300">
     <div className="flex flex-col gap-6 items-start">
       <div>
         <img src={logo} alt="Ticketeer Logo" />
@@ -19,7 +19,6 @@ const Footer = () => {
       </p>
     </div>
     <div className="flex lg:gap-20 md:gap-10 gap-12">
-      {/* About Section */}
       <div className="flex flex-col gap-6">
         <div className="font-lora lg:font-semibold font-medium lg:text-lg md:text-base text-sm">
           About
@@ -37,7 +36,6 @@ const Footer = () => {
         </ul>
       </div>
 
-      {/* Blog Section */}
       <div className="flex flex-col gap-6">
         <div className="font-lora lg:font-semibold font-medium lg:text-lg md:text-base text-sm">
           Blog
@@ -55,7 +53,6 @@ const Footer = () => {
         </ul>
       </div>
 
-      {/* Event Section */}
       <div className="flex flex-col gap-6">
         <div className="font-lora lg:font-semibold font-medium lg:text-lg md:text-base text-sm">
           Event

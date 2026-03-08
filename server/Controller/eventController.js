@@ -34,7 +34,6 @@ const createEvent = asyncHandler(async (req, res) => {
       categories,
     } = req.body;
 
-    // Validate required fields
     if (
       !title ||
       !description ||
@@ -375,7 +374,7 @@ const validateTicketSelection = async ({ eventId, selectedTickets }) => {
       );
     }
 
-    const fee = ticketType.price * 0.02;
+    const fee = ticketType.price * 0.05;
     total += (ticketType.price + fee) * quantity;
 
     validTickets.push({
@@ -645,38 +644,6 @@ const purchaseTicket = asyncHandler(async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 });
-
-// const getTicket = asyncHandler(async (req, res) => {
-//   try {
-//     const { ticketId } = req.params;
-
-//     console.log('Ticket Id:', ticketId)
-
-//     // Validate ticket ID
-//     if (!ticketId) {
-//       return res.status(400).json({ message: "Ticket ID is required" });
-//     }
-
-//     // Find ticket and populate related fields
-//     const ticket = await Ticket.findById(ticketId)
-//     .populate("userId", "name email photo") // Populate user details (name, email)
-//     .populate(
-//       "eventId",
-//       "title description eventType meetLink category location startDate startTime endDate endTime"
-//     )
-//     .populate("ticketTypeId", "type price quantity description"); // Populate ticket type details
-
-//     if (!ticket) {
-//       return res.status(404).json({ message: "Ticket not found" });
-//     }
-
-//     return res.status(200).json(ticket);
-//   } catch (error) {
-//     return res
-//       .status(500)
-//       .json({ message: "Error fetching ticket", error: error.message });
-//   }
-// });
 
 const getTicket = asyncHandler(async (req, res) => {
   try {

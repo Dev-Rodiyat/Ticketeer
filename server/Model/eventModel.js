@@ -46,7 +46,6 @@ const ticketSchema = new mongoose.Schema(
     quantity: { type: Number },
     qrCode: { type: String },
     purchaseDate: { type: Date, default: Date.now },
-    checkInTime: { type: Date, default: Date.now },
     status: {
       type: String,
       enum: ["going", "checkedIn"],
@@ -168,10 +167,6 @@ const eventSchema = new mongoose.Schema(
       required: false,
     },
     limit: { type: Number, required: true },
-    hasBooked: {
-      type: Boolean,
-      default: false,
-    },
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
     averageRating: { type: Number, default: 0 },
   },

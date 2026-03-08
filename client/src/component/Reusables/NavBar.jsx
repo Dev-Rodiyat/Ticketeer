@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import TicketeerLogo from "./../../assets/Ticketeer-Logo.png";
+// import TicketeerLogo from "./../../assets/NewLogo.png";
 import logo from "./../../assets/ticket-logo.png";
 import { IoMdMenu } from "react-icons/io";
 import { Link, useLocation } from "react-router-dom";
@@ -149,7 +150,7 @@ const NavBar = () => {
                 </Link>
               </>
             )}
-            {/* Mobile Menu Button */}
+
             <button className="lg:hidden" onClick={openModal}>
               <IoMdMenu
                 className={`text-2xl sm:text-3xl transition-all duration-700 ease-in-out hover:bg-orange-100 dark:hover:bg-zinc-700 cursor-pointer p-4 h-14 w-14 rounded-lg ${

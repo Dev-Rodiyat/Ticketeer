@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import FavouriteEvents from "../EventView/FavouriteEvents";
+import { Country, State, City } from "country-state-city";
 
 const formatDate = (dateString) => {
   return format(new Date(dateString), "dd-MM-yyyy");
@@ -31,10 +32,19 @@ const EventList = ({ events }) => {
     e.stopPropagation();
     dispatch(toggleLike(eventId));
   };
-  
+
+  const getCountryName = (code) =>
+    Country.getCountryByCode(code)?.name || code;
+
+  const getStateName = (code, countryCode) =>
+    State.getStatesOfCountry(countryCode)?.find((s) => s.isoCode === code)?.name || code;
+
+  const getCityName = (name, stateCode, countryCode) =>
+    City.getCitiesOfState(countryCode, stateCode)?.find((c) => c.name === name)?.name || name;
+
   const likedEvents = events.filter(event =>
     event.likedUsers?.some(user => user._id === currentUserId)
-  );  
+  );
 
   if (loading.events) {
     return <Loader loading={loading.events} />;
@@ -99,18 +109,20 @@ const EventList = ({ events }) => {
                     </td>
 
                     <td className="px-5 py-4 whitespace-nowrap">
-                       {event.location[2]}, {event.location[1]}
+                      {getCityName(event.location[3], event.location[2], event.location[1])},{" "}
+                      {getStateName(event.location[2], event.location[1])},{" "}
+                      {getCountryName(event.location[1])}
                     </td>
 
                     <td className="px-5 py-4 whitespace-nowrap">
-                        <a
-                          href={event.meetLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 hover:underline"
-                        >
-                          Join
-                        </a>
+                      <a
+                        href={event.meetLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        Join
+                      </a>
                     </td>
 
                     <td className="px-5 py-4 whitespace-nowrap">

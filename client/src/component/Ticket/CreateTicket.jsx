@@ -11,6 +11,7 @@ import EventDetails from "../Event/EventDetails";
 import { IoLocationOutline, IoVideocamOutline } from "react-icons/io5";
 import Loader from "../Spinners/Loader";
 import ClipLoader from "react-spinners/ClipLoader";
+import { Country, State, City } from 'country-state-city';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -99,6 +100,15 @@ const CreateTicket = () => {
     if (isNaN(number)) return "";
     return number.toLocaleString("en-NG");
   };
+
+  const getCountryName = (code) =>
+    Country.getCountryByCode(code)?.name || code;
+
+  const getStateName = (code, countryCode) =>
+    State.getStatesOfCountry(countryCode)?.find((s) => s.isoCode === code)?.name || code;
+
+  const getCityName = (name, stateCode, countryCode) =>
+    City.getCitiesOfState(countryCode, stateCode)?.find((c) => c.name === name)?.name || name;
 
   const createTicket = async () => {
     if (event?.ticketTypes.length >= 5) {
@@ -215,9 +225,11 @@ const CreateTicket = () => {
                 )}
                 <div>
                   {event?.location?.[2] && event?.location?.[1] && (
-                    <div className="flex gap-2">
+                    <div className="flex gap-1">
                       <IoLocationOutline size={18} />
-                      <p>{`${event.location[2]}, ${event.location[1]}`}</p>
+                      {getCityName(event.location[3], event.location[2], event.location[1])},{" "}
+                      {getStateName(event.location[2], event.location[1])},{" "}
+                      {getCountryName(event.location[1])}
                     </div>
                   )}
                 </div>
@@ -228,14 +240,25 @@ const CreateTicket = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neutral-800 shadow-lg rounded-3xl border border-orange-200 dark:border-neutral-700 p-6">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Host</p>
-            <p className="font-semibold text-base text-gray-800 dark:text-gray-200">
-              {user.name}{" "}
-              <span className="text-gray-500 dark:text-gray-400 text-sm">
-                (you)
-              </span>
-            </p>
+          <div className="bg-white dark:bg-neutral-800 shadow-lg rounded-3xl border border-orange-200 dark:border-neutral-700 p-6 space-y-3">
+            <p className="text-sm text-gray-500 dark:text-gray-400 pl-1">Host</p>
+            <div className="flex gap-1">
+              <div className="w-6 h-6 rounded-full overflow-hidden bg-white dark:bg-zinc-700 shadow-sm">
+                <img
+                  src={
+                    user?.photo?.imageUrl
+                  }
+                  alt="Organizer"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <p className="font-semibold text-base text-gray-800 dark:text-gray-200">
+                {user.name}{" "}
+                <span className="text-gray-500 dark:text-gray-400 text-sm">
+                  (you)
+                </span>
+              </p>
+            </div>
           </div>
         </div>
 
@@ -339,37 +362,9 @@ const CreateTicket = () => {
                   value={ticketData.description}
                 />
               </div>
-
-              {/* <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={handleAddAnotherTicket}
-                  aria-label="Add another ticket"
-                  className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white text-base font-medium px-6 py-3 rounded-full transition duration-200"
-                >
-                  <IoIosAdd size={20} />
-                  Add another ticket
-                </button>
-              </div> */}
             </form>
           </div>
 
-          {/* {allTickets.length > 0 && (
-            <div className="bg-white dark:bg-neutral-800 shadow-lg rounded-3xl border border-orange-200 dark:border-neutral-700 p-6">
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                Tickets Added:
-              </h4>
-              <ul className="list-disc pl-5 text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                {allTickets.map((ticket, index) => (
-                  <li key={index}>
-                    {ticket.type} — ${ticket.price} — Qty: {ticket.quantity}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )} */}
-
-          {/* Footer */}
           <div className="flex flex-col sm:flex-row justify-end items-center gap-4 sm:gap-0">
             <button
               onClick={handleSubmit}

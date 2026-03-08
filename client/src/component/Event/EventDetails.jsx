@@ -28,6 +28,8 @@ import ReactivateModal from "../Modals/EventModal/ReactivateModal";
 import EditTicketModal from "../Modals/TicketModal/EditTicketModal";
 import AddTicketModal from "../Modals/TicketModal/AddTicketModal";
 import TicketInfoModal from "../Modals/TicketModal/TicketInfoModal";
+import { Country, State, City } from 'country-state-city';
+import TicketAnalytics from "../Ticket/TicketAnalytics";
 
 const CLIENT_URL = import.meta.env.VITE_CLIENT_URL;
 
@@ -59,13 +61,23 @@ const EventDetails = () => {
   const [reactivateModalOpen, setReactivateModalOpen] = useState(false);
   const [showFull, setShowFull] = useState(false);
 
+  const formatPrice = (value) => {
+    if (value === null || value === undefined || isNaN(Number(value))) {
+      return value;
+    }
+    return new Intl.NumberFormat("en-NG", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(Number(value));
+  };
+
   const navigate = useNavigate();
   const location = useLocation();
 
   const { eventId } = useParams(); // Get eventId from URL
   const dispatch = useDispatch();
 
-  const [isFormChanged, setIsFormChanged] = useState(false);
+  // const [isFormChanged, setIsFormChanged] = useState(false);
   const [isPhotoChanged, setIsPhotoChanged] = useState(false);
 
   const [imageFile, setImageFile] = useState({
@@ -104,6 +116,16 @@ const EventDetails = () => {
     handleEventDetails();
   }, [eventId, dispatch, getEventDetails]);
 
+  const getCountryName = (code) =>
+    Country.getCountryByCode(code)?.name || code;
+
+  const getStateName = (code, countryCode) =>
+    State.getStatesOfCountry(countryCode)?.find((s) => s.isoCode === code)?.name || code;
+
+  const getCityName = (name, stateCode, countryCode) =>
+    City.getCitiesOfState(countryCode, stateCode)?.find((c) => c.name === name)?.name || name;
+
+
   if (loading.eventDetails) {
     return <Loader loading={loading.eventDetails} />;
   }
@@ -130,7 +152,7 @@ const EventDetails = () => {
     setEditingTicket(null);
   };
 
-  const openAddTicketModal = (ticket) => {
+  const openAddTicketModal = () => {
     setAddTicketModalOpen(true);
   };
 
@@ -164,25 +186,25 @@ const EventDetails = () => {
     setShareModalOpen(false);
   };
 
-  const openCancelModal = () => {
-    setCancelModalOpen(true);
-  };
+  // const openCancelModal = () => {
+  //   setCancelModalOpen(true);
+  // };
 
   const closeCancelModal = () => {
     setCancelModalOpen(false);
   };
 
-  const openReactivateModal = () => {
-    setReactivateModalOpen(true);
-  };
+  // const openReactivateModal = () => {
+  //   setReactivateModalOpen(true);
+  // };
 
   const closeReactivateModal = () => {
     setReactivateModalOpen(false);
   };
 
-  const openDeleteModal = () => {
-    setDeleteModalOpen(true);
-  };
+  // const openDeleteModal = () => {
+  //   setDeleteModalOpen(true);
+  // };
 
   const closeDeleteModal = () => {
     setDeleteModalOpen(false);
@@ -252,7 +274,7 @@ const EventDetails = () => {
         toast.warn("Image uploaded, but URL not returned.");
       }
     } catch (error) {
-      toast.error("Failed to upload photo. Please try again.");
+      toast.error(error || "Failed to upload photo. Please try again.");
     }
   };
 
@@ -280,7 +302,7 @@ const EventDetails = () => {
       });
   };
 
-  const isUpdateDisabled = !isFormChanged && !isPhotoChanged;
+  const isUpdateDisabled = !isPhotoChanged;
 
   const isUpcoming = () => {
     if (!eventDetails?.startDate || !eventDetails?.startTime) {
@@ -303,12 +325,27 @@ const EventDetails = () => {
     return new Date() < eventDateTime;
   };
 
-  const description = eventDetails.description;
+  const rawDescription = eventDetails?.description || "";
+
+  // Strip HTML tags and normalize whitespace for length checks and preview
+  const plainDescription =
+    typeof rawDescription === "string"
+      ? rawDescription.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
+      : "";
 
   const toggleShow = () => setShowFull((prev) => !prev);
-  const isLong = description?.length > 50;
+  const isLong = plainDescription.length > 120;
+  const previewText = isLong
+    ? plainDescription.slice(0, 120)
+    : plainDescription;
 
-  const handleNavigate = (eventId) => {
+  const categoryChips =
+    eventDetails?.categories
+      ?.split(" ")
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) || [];
+
+  const handleNavigate = () => {
     navigate(`/scan-ticket`, {
       state: { from: location.pathname }, // Save previous route
     });
@@ -335,41 +372,60 @@ const EventDetails = () => {
         </button>
 
         <div className="flex flex-col gap-3">
-          <p className="text-3xl font-bold">{eventDetails.title}</p>
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
+            <p className="text-3xl font-bold tracking-tight">
+              {eventDetails.title}
+            </p>
+            {eventDetails?.organizer?.name && (
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                Hosted by{" "}
+                <span className="font-semibold text-orange-600 dark:text-orange-300">
+                  {eventDetails.organizer.name}
+                </span>
+              </p>
+            )}
+          </div>
           {isUpcoming() ? (
-            <div className="text-base text-gray-600 dark:text-zinc-300">
-              {showFull ? (
-                <section className="prose dark:prose-invert max-w-none">
-                  <div dangerouslySetInnerHTML={{ __html: description }} />
-                </section>
-              ) : (
-                <section className="prose dark:prose-invert max-w-none">
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        typeof description === "string"
-                          ? description.replace(/<[^>]+>/g, "").slice(0, 120)
-                          : "",
-                    }}
-                  />
-                </section>
-              )}
+            <div className="text-gray-700 dark:text-zinc-200">
+              {/* Description */}
+              <div className="text-base leading-relaxed">
+                {showFull ? (
+                  <section className="prose dark:prose-invert max-w-none">
+                    <div
+                      dangerouslySetInnerHTML={{ __html: rawDescription }}
+                    />
+                  </section>
+                ) : (
+                  <section className="prose dark:prose-invert max-w-none">
+                    <div
+                      dangerouslySetInnerHTML={{ __html: previewText }}
+                    />
+                  </section>
+                )}
+              </div>
 
-              {isLong && (
+              {isLong && plainDescription && (
                 <button
                   onClick={toggleShow}
-                  className="text-orange-500 underline text-sm mt-1"
+                  className="mt-2 text-xs font-medium text-orange-600 hover:text-orange-700 dark:text-orange-300 dark:hover:text-orange-200 underline"
                 >
                   {showFull ? "See less" : "See more"}
                 </button>
               )}
 
-              <p className="mt-1 text-sm font-medium text-primary/80">
-                {eventDetails.categories
-                  .split(" ")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")}
-              </p>
+              {/* Categories */}
+              {categoryChips.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-1">
+                  {categoryChips.map((label, index) => (
+                    <span
+                      key={`${label}-${index}`}
+                      className="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-200 text-xs font-semibold uppercase tracking-wide"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
             <div className="bg-red-100 dark:bg-zinc-800 border border-red-200 dark:border-zinc-700 rounded-lg px-4 py-3 text-sm text-red-800 dark:text-red-300">
@@ -381,7 +437,7 @@ const EventDetails = () => {
           )}
         </div>
 
-        <div className="flex flex-wrap gap-3 sm:gap-4">
+        <div className="flex flex-wrap gap-3 sm:gap-4 mt-1">
           {[
             {
               label: "Check in Guest",
@@ -394,9 +450,9 @@ const EventDetails = () => {
               onClick: openShareModal,
             },
             {
-              label: "Delete event",
-              icon: <RiDeleteBin5Line size={18} />,
-              onClick: openDeleteModal,
+              label: " Scan Tcket",
+              icon: <TbTicket size={18} />,
+              onClick: handleNavigate,
             },
           ]
             .filter(Boolean)
@@ -414,7 +470,7 @@ const EventDetails = () => {
 
         <div className="flex flex-col lg:flex-row gap-5 mt-2">
           <section className="w-full mt-6 flex flex-col lg:flex-row items-stretch gap-6">
-            <div className="w-full lg:w-[300px] rounded-2xl bg-orange-100/30 dark:bg-zinc-800/50 backdrop-blur-sm border border-orange-300 dark:border-zinc-700 shadow-lg p-4 relative">
+            <div className="w-full lg:w-[320px] rounded-2xl bg-orange-100/40 dark:bg-zinc-900/50 backdrop-blur-sm border border-orange-200 dark:border-zinc-700 shadow-lg p-4 relative">
               <div className="w-full h-[200px] rounded-xl overflow-hidden relative">
                 <img
                   src={profilePhoto || eventDetails?.image?.imageUrl}
@@ -458,7 +514,7 @@ const EventDetails = () => {
               )}
             </div>
 
-            <div className="bg-orange-100/30 dark:bg-zinc-800/50 backdrop-blur-sm border border-orange-300 dark:border-zinc-700 rounded-2xl p-6 shadow-lg flex-1">
+            <div className="bg-orange-100/40 dark:bg-zinc-900/50 backdrop-blur-sm border border-orange-200 dark:border-zinc-700 rounded-2xl p-6 shadow-lg flex-1">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-bold tracking-wide text-zinc-800 dark:text-zinc-100">
                   Event Recap
@@ -489,12 +545,22 @@ const EventDetails = () => {
                 </div>
               </div>
 
-              {eventDetails?.location && (
+              {eventDetails?.location && eventDetails.location.length > 0 ? (
                 <div className="flex gap-4 items-start text-zinc-800 dark:text-zinc-200 mb-6">
                   <IoLocationOutline size={24} className="mt-1" />
                   <p className="py-1 w-full border-b border-zinc-300 dark:border-zinc-600 text-sm">
-                    {eventDetails?.location?.join(", ") ||
-                      "Location not available"}
+                    {eventDetails.location[0]},{" "}
+                    {eventDetails.location[4]},{" "}
+                    {getCityName(eventDetails.location[3], eventDetails.location[2], eventDetails.location[1])},{" "}
+                    {getStateName(eventDetails.location[2], eventDetails.location[1])},{" "}
+                    {getCountryName(eventDetails.location[1])}.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex gap-4 items-start text-zinc-800 dark:text-zinc-200 mb-6">
+                  <IoLocationOutline size={24} className="mt-1" />
+                  <p className="py-1 w-full border-b border-zinc-300 dark:border-zinc-600 text-sm">
+                    Location not available
                   </p>
                 </div>
               )}
@@ -513,18 +579,6 @@ const EventDetails = () => {
                 </div>
               )}
 
-              {/* <Link to="/scan-ticket"> */}
-              <div
-                onClick={handleNavigate}
-                className="flex gap-4 items-start text-zinc-800 dark:text-zinc-200 mb-6 cursor-pointer"
-              >
-                <TbTicket size={24} className="mt-1 hover:text-orange-600" />
-                <p className="py-1 w-full border-b border-zinc-300 dark:border-zinc-600 text-sm hover:text-orange-600">
-                  Scan Tcket
-                </p>
-              </div>
-              {/* </Link> */}
-
               <div className="flex gap-4 items-center text-zinc-800 dark:text-zinc-200 mt-4">
                 <FaRegUser size={20} />
                 <p className="text-sm">
@@ -536,12 +590,18 @@ const EventDetails = () => {
               </div>
             </div>
 
-            <div className="bg-orange-100/30 dark:bg-zinc-800/50 backdrop-blur-sm border border-orange-300 dark:border-zinc-700 rounded-2xl p-6 shadow-lg flex-1 flex flex-col">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold">Ticket Types</h3>
+            <div className="bg-orange-100/40 dark:bg-zinc-900/50 backdrop-blur-sm border border-orange-200 dark:border-zinc-700 rounded-2xl p-6 shadow-lg flex-1 flex flex-col">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="text-xl font-semibold">Ticket Types</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Manage pricing and capacity for this event.
+                  </p>
+                </div>
                 {eventDetails &&
                   eventDetails?.ticketTypes &&
-                  eventDetails?.ticketTypes.length < 5 && (
+                  eventDetails?.ticketTypes.length < 4 &&
+                  new Date(eventDetails.startDate) > new Date() && (
                     <button
                       onClick={openAddTicketModal}
                       className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl transition duration-200 text-sm"
@@ -557,25 +617,35 @@ const EventDetails = () => {
                     <div
                       key={index}
                       onClick={() => openTicketModal(ticket)}
-                      className="border border-gray-300 dark:border-gray-700 rounded-xl p-4 cursor-pointer hover:bg-orange-50 dark:hover:bg-zinc-700/40 transition"
+                      className="border border-orange-200/80 dark:border-zinc-700 rounded-xl p-4 cursor-pointer hover:bg-orange-50 dark:hover:bg-zinc-800/60 transition flex flex-col gap-2"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h4 className="text-md font-medium">{ticket.type}</h4>
-                        <FaRegEdit
-                          onClick={(e) => {
-                            e.stopPropagation(); // prevent triggering ticket modal
-                            openEditTicketModal(ticket);
-                          }}
-                          className="text-gray-500 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition"
-                          size={16}
-                        />
+
+                        {/* ✅ Only show edit icon if event hasn't started */}
+                        {new Date(eventDetails.startDate) > new Date() && (
+                          <FaRegEdit
+                            onClick={(e) => {
+                              e.stopPropagation(); // prevent triggering ticket modal
+                              openEditTicketModal(ticket);
+                            }}
+                            className="text-gray-500 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition"
+                            size={16}
+                          />
+                        )}
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Price: ${ticket.price}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Quantity: {ticket.totalQuantity}
-                      </p>
+
+                      <div className="flex flex-col gap-1 text-sm text-gray-600 dark:text-gray-300">
+                        <p>
+                          <span className="font-medium">Price:</span> ₦
+                          {formatPrice(ticket.price)}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          {ticket.availableQuantity !== undefined
+                            ? `${ticket.totalQuantity - ticket.availableQuantity} sold · ${ticket.availableQuantity} left`
+                            : `Quantity: ${ticket.totalQuantity}`}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -596,6 +666,8 @@ const EventDetails = () => {
             </div>
           </section>
         </div>
+
+        <TicketAnalytics ticketTypes={eventDetails.ticketTypes} />
 
         <div className="flex justify-between items-center gap-4 px-4 py-3 rounded-xl bg-orange-100/30 dark:bg-zinc-800/50 text-zinc-800 dark:text-zinc-200 border border-orange-300 dark:border-zinc-700 shadow-lg">
           <div className="flex items-center gap-2 overflow-hidden">

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BsBell } from "react-icons/bs";
-import { FaCube, FaMobileAlt } from "react-icons/fa";
+import { FaCalendarTimes, FaCube, FaMobileAlt, FaShareAlt } from "react-icons/fa";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
+import { TbCurrencyNaira } from "react-icons/tb";
+import { BiSolidPurchaseTag } from "react-icons/bi";
 
 import hero from "./../../assets/Hero-Bg.png";
 import business from "./../../assets/Business.png";
@@ -62,19 +64,19 @@ const howItWorks = [
       "Track ticket sales, manage guest lists, and access event analytics in real-time.",
   },
   {
-    icon: <FaUsersCog className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />,
+    icon: <BiSolidPurchaseTag className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />,
     title: "Ticket Purchase",
     description:
       "Purchase ticket to events of your choice and get notified about all that goes on",
   },
   {
-    icon: <FaUsersCog className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />,
+    icon: <FaShareAlt className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />,
     title: "Share Event",
     description:
       "Share events on your social media handles and make them go live and popular",
   },
   {
-    icon: <FaUsersCog className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />,
+    icon: <FaCalendarTimes className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />,
     title: "Cancel and Resume Event",
     description:
       "Cancel and resume events if needed and both organizers and attendees get real time notification about it",
@@ -88,7 +90,7 @@ const choice = [
   },
   {
     strong: "Flexible Ticketing",
-    normal: "Offer multiple ticket tiers, discounts, and group pricing.",
+    normal: "Create ticket tiers with custom pricing and bundle options.",
   },
   {
     strong: "Secure Transactions",
@@ -98,10 +100,10 @@ const choice = [
     strong: "Powerful Analytics",
     normal: "Monitor sales, attendance, and engagement with real-time data.",
   },
-  {
-    strong: "24/7 Support",
-    normal: "Get help anytime from our dedicated support team.",
-  },
+  // {
+  //   strong: "24/7 Support",
+  //   normal: "Get help anytime from our dedicated support team.",
+  // },
 ];
 
 const faq = [
@@ -111,14 +113,19 @@ const faq = [
       "Ticketeer supports a wide range of events — from concerts, festivals, and sports matches to workshops, conferences, webinars, and more.",
   },
   {
+    question: "How do I purchase tickets for an event?",
+    answer:
+      "Simply browse events on Ticketeer, select the one you’re interested in, choose your ticket type, and proceed with our secure checkout process.",
+  },
+  {
     question: "How do I create and publish an event on Ticketeer?",
     answer:
       "Log in to your account and click on “Create Event.” Fill out the event details including title, date, venue, ticket options, and images. Once you're ready, publish it — your event will go live instantly!",
   },
   {
-    question: "Can I offer discounts or promo codes for my event?",
+    question: "Where can I find the tickets I’ve purchased?",
     answer:
-      "Absolutely! You can easily create discount codes and promotional offers to boost ticket sales and reward loyal attendees.",
+      "All your purchased tickets are stored in your Ticketeer account under 'My Tickets.' You’ll also receive them by email for easy access at the event.",
   },
   {
     question: "How can I track ticket sales and attendees?",
@@ -135,14 +142,13 @@ const power = [
   },
   {
     title: "Check-in",
-    desc: "Speed up entry with eiter email and password input or google authentication.",
+    desc: "Speed up entry with either email and password or Google sign-in.",
     icon: <FaMobileAlt className="text-orange-500 text-3xl" />,
   },
   {
-    title: "Flutterwave Payments",
-    desc: "Accept global payments securely with Flutterwave integration.",
-    // icon: <FlutterwaveIcon className="text-orange-500 text-3xl w-6 h-6 mr-2" />              ,
-    icon: <SiStripe className="text-orange-500 text-3xl" />,
+    title: "Payment Integration",
+    desc: "Accept global payments securely with Flutterwave and Paystack integrations.",
+    icon: <TbCurrencyNaira className="text-orange-500 text-3xl" />,
   },
   {
     title: "Event Dashboard",
@@ -156,7 +162,7 @@ const power = [
   },
   {
     title: "Explore Events",
-    desc: "Explore events in order to purchase tickets of your choice",
+    desc: "Explore events and purchase tickets of your choice",
     // icon: <MdOutlineMailOutline className="text-orange-500 text-3xl"/>,
     icon: <MdOutlineExplore className="text-orange-500 text-3xl" />,
   },
@@ -185,34 +191,47 @@ const Home = () => {
     });
   };
 
-  if (showSplash) return <SplashScreen onComplete={() => {}} />;
+  if (showSplash) return <SplashScreen onComplete={() => { }} />;
 
   return (
     <div className="bg-gradient-to-b from-orange-50 to-white dark:from-zinc-900 dark:to-zinc-950 min-h-screen flex flex-col gap-24 pb-32">
       {/* Hero Section */}
-      <section
-        style={{ backgroundImage: `url(${hero})` }}
-        className="text-white brightness-75 h-screen w-full bg-no-repeat bg-cover flex flex-col items-center justify-center gap-8 text-center px-6"
-      >
-        <h1 className="text-5xl md:text-6xl font-bold font-merriweather">
-          Experience Events Like Never Before
-        </h1>
-        <p className="text-lg md:text-xl font-inter max-w-xl">
-          Discover and host unforgettable moments. Your next concert, festival,
-          or show starts here.
-        </p>
-        <div className="flex flex-wrap gap-4 justify-center">
-          <Link to="/create-event">
-            <button className="bg-orange-500 hover:bg-orange-700 px-12 py-3 rounded-full text-white text-lg font-medium transition">
-              Create Event
-            </button>
-          </Link>
+      <section className="relative h-screen w-full overflow-hidden">
+        <div
+          style={{ backgroundImage: `url(${hero})` }}
+          className="absolute inset-0 bg-no-repeat bg-cover bg-center brightness-75"
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
+        <div className="relative z-10 h-full flex flex-col items-center justify-center gap-8 text-center px-6 text-white">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold font-merriweather drop-shadow-md">
+            Experience Events Like Never Before
+          </h1>
+          <p className="text-base sm:text-lg md:text-xl font-inter max-w-xl drop-shadow-sm">
+            Discover and host unforgettable moments. Your next concert, festival,
+            or show starts here.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link to="/create-event">
+              <button className="bg-orange-500 hover:bg-orange-600 px-10 sm:px-12 py-3 rounded-full text-white text-base sm:text-lg font-medium transition shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 focus:ring-offset-transparent">
+                Create Event
+              </button>
+            </Link>
+            <Link to="/event-list">
+              <button className="bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/40 px-10 sm:px-12 py-3 rounded-full text-white text-base sm:text-lg font-medium transition focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent">
+                Explore Events
+              </button>
+            </Link>
+          </div>
+          <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-xs uppercase tracking-widest text-white/80 animate-bounce">
+            Scroll to explore
+          </p>
         </div>
       </section>
 
       {/* Vibe Section */}
-      <section className="w-full max-w-7xl mx-auto px-6 md:px-8 lg:px-16 text-center flex flex-col items-center gap-12">
-        <h2 className="text-3xl md:text-5xl font-bold font-lora text-gray-900 dark:text-white">
+      <section className="w-full max-w-7xl mx-auto px-6 md:px-8 lg:px-12 text-center flex flex-col items-center gap-12">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-merriweather text-zinc-900 dark:text-white">
           What’s your <span className="text-orange-500">Vibe</span>?
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -240,8 +259,8 @@ const Home = () => {
       </section>
 
       {/* How it Works Section */}
-      <section className="w-full max-w-7xl mx-auto px-6 md:px-8 lg:px-16 py-5 flex flex-col gap-10">
-        <h2 className="font-inter font-semibold text-2xl md:text-3xl text-gray-800 dark:text-white">
+      <section className="w-full max-w-7xl mx-auto px-6 md:px-8 lg:px-12 py-8 flex flex-col gap-10">
+        <h2 className="text-3xl md:text-4xl font-bold font-merriweather text-zinc-900 dark:text-white">
           How It Works
         </h2>
 
@@ -270,10 +289,10 @@ const Home = () => {
       {/* Powering Events Section */}
       <section
         id="events"
-        className="bg-white dark:bg-zinc-950 pt-12 px-6 md:px-16"
+        className="bg-gradient-to-b from-orange-50/50 to-white dark:from-zinc-900 dark:to-zinc-950 pt-16 pb-16 px-6 md:px-8 lg:px-12"
       >
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center gap-6">
-          <h2 className="text-3xl md:text-5xl font-semibold text-zinc-900 dark:text-white font-merriweather">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-merriweather text-zinc-900 dark:text-white">
             Powering Seamless Events
           </h2>
           <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl">
@@ -282,11 +301,11 @@ const Home = () => {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
           {power.map(({ title, desc, icon }, i) => (
             <div
               key={i}
-              className="bg-orange-50 dark:bg-zinc-800 rounded-2xl p-6 flex flex-col gap-4 shadow-md hover:shadow-xl transition-all"
+              className="bg-orange-50 dark:bg-zinc-800 rounded-2xl p-6 flex flex-col gap-4 shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
             >
               <div className="w-12 h-12 bg-orange-100 dark:bg-zinc-700 rounded-full flex items-center justify-center">
                 {icon}
@@ -303,10 +322,10 @@ const Home = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 md:gap-10 px-6 md:px-8 lg:px-16">
-        <p className="font-inter font-semibold text-xl sm:text-2xl md:text-3xl text-gray-900 dark:text-white">
+      <section className="w-full max-w-7xl mx-auto flex flex-col gap-6 md:gap-10 px-6 md:px-8 lg:px-12">
+        <h2 className="text-3xl md:text-4xl font-bold font-merriweather text-zinc-900 dark:text-white">
           Why choose us?
-        </p>
+        </h2>
         <div className="flex flex-col gap-4">
           {choice.map(({ strong, normal }, index) => (
             <div
@@ -328,26 +347,30 @@ const Home = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="w-full max-w-6xl mx-auto px-6 md:px-8 lg:px-16 pt-8 md:pt-12 font-inter">
-        <h2 className="font-inter font-bold text-2xl sm:text-3xl md:text-4xl mb-6 text-gray-900 dark:text-white">
+      <section className="w-full max-w-4xl mx-auto px-6 md:px-8 lg:px-12 pt-8 md:pt-12 font-inter">
+        <h2 className="text-3xl md:text-4xl font-bold font-merriweather text-zinc-900 dark:text-white mb-8">
           FAQs
         </h2>
 
-        <div className="divide-y divide-gray-200 dark:divide-zinc-700 border-y border-gray-200 dark:border-zinc-700">
+        <div className="divide-y divide-zinc-200 dark:divide-zinc-700 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden bg-white/50 dark:bg-zinc-800/30">
           {faq?.map(({ question, answer }, index) => {
             const isOpen = openStates[index];
             return (
-              <div key={index} className="py-4 md:py-6">
+              <div key={index} className="px-4 sm:px-6 py-4 md:py-5">
                 <button
                   onClick={() => toggleOpen(index)}
-                  className="flex justify-between items-center w-full text-left group"
+                  aria-expanded={isOpen}
+                  className="flex justify-between items-center gap-4 w-full text-left group"
                 >
-                  <span className="font-inter font-medium text-base sm:text-lg md:text-xl text-gray-800 dark:text-white group-hover:text-orange-500 transition-colors">
+                  <span className="font-medium text-base sm:text-lg text-zinc-800 dark:text-zinc-100 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors">
                     {question}
+                  </span>
+                  <span className="flex-shrink-0 text-orange-500 transition-transform duration-200" style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>
+                    <FaAngleDown className="w-5 h-5" />
                   </span>
                 </button>
                 {isOpen && (
-                  <p className="mt-2 text-sm md:text-base text-gray-600 dark:text-zinc-300">
+                  <p className="mt-3 pl-0 text-sm md:text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
                     {answer}
                   </p>
                 )}

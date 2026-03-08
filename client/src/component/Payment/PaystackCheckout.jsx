@@ -14,7 +14,7 @@ const PaystackCheckout = ({ user, event, selectedTickets, tickets }) => {
   const total = selectedTickets.reduce((sum, { ticketTypeId, quantity }) => {
     const ticket = tickets.find((t) => t._id === ticketTypeId);
     if (!ticket) return sum;
-    const fee = ticket.price * 0.02;
+    const fee = ticket.price * 0.05;
     return sum + (ticket.price + fee) * quantity;
   }, 0);
 
@@ -48,10 +48,8 @@ const PaystackCheckout = ({ user, event, selectedTickets, tickets }) => {
         return;
       }
 
-      // Step 2: Create a unique reference
       const ref = `ticketeer_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-      // Step 3: Initialize payment
       initializePayment({
         reference: ref,
         email: user.email,
@@ -64,7 +62,7 @@ const PaystackCheckout = ({ user, event, selectedTickets, tickets }) => {
         },
         onSuccess: async (refData) => {
           try {
-            setIsVerifying(true); // Start loader before verification
+            setIsVerifying(true);
 
             const res = await api.post(
               "/payments/paystack/verify",
@@ -121,7 +119,12 @@ const PaystackCheckout = ({ user, event, selectedTickets, tickets }) => {
           : "bg-orange-500 hover:bg-orange-600"
       } text-white font-semibold rounded-full transition`}
     >
-      {isLoading ? "Processing..." : `Pay ₦${total.toFixed(2)}`}
+      {isLoading
+        ? "Processing..."
+        : `Pay ₦${total.toLocaleString("en-NG", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`}
     </button>
   );
 };

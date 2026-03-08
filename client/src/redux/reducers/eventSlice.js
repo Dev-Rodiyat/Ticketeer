@@ -354,7 +354,7 @@ export const purchaseTicketThunk = createAsyncThunk(
       const session = response.data?.session;
 
       if (session?.url) {
-        window.location.href = session.url; // 🔁 Redirect to Stripe in same tab
+        window.location.href = session.url;
       } else {
         throw new Error("Stripe session URL not found.");
       }

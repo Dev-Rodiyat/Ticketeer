@@ -106,7 +106,7 @@ const ProfileUpdate = () => {
       .then(() => {
         console.log("prfile updated successfully");
         toast.success("Profile updated successfully!");
-        navigate("/settings"); // ✅ Redirect after update
+        // navigate("/settings"); // ✅ Redirect after update
       })
       .catch((err) => {
         console.log("updated failed");
@@ -135,7 +135,7 @@ const ProfileUpdate = () => {
         setFormData((prev) => ({ ...prev, photo: imageUrl.photo }));
         setIsPhotoChanged(false);
         toast.success("Profile picture updated successfully!");
-        navigate("/settings");
+        // navigate("/settings");
       })
       .catch((error) => {
         toast.error(error || "Failed to upload photo. Please try again.");

@@ -17,11 +17,7 @@ import ScrollToTop from "./component/Layouts/ScrollToTop";
 import Home from "./component/Pages/Home";
 import About from "./component/Pages/About";
 import Blog from "./component/Pages/Blog";
-import Events from "./component/Event/Events";
-import Organizer from "./component/Pages/Organizer";
-import FAQ from "./component/Pages/FAQ";
 import NotFound from "./component/Pages/NotFound";
-import Reviews from "./component/User/Reviews/Reviews";
 
 // Auth
 import Login from "./component/User/Authentication/Login";
@@ -34,30 +30,21 @@ import CreateEvent from "./component/Event/CreateEvent";
 import MyEvents from "./component/Event/MyEvents";
 import EventView from "./component/Event/EventView";
 import EventDetails from "./component/Event/EventDetails";
-import EventListLayout from "./component/Event/EventListLayout";
 import CreateTicket from "./component/Ticket/CreateTicket";
 import MyTickets from "./component/Ticket/MyTickets";
-import Ticket from "./component/Modals/TicketModal/Ticket";
-import PurchaseTicketModal from "./component/Modals/TicketModal/PurchaseTicketModal";
 import Settings from "./component/User/Setting/Settings";
 import ProfileUpdate from "./component/User/Setting/ProfileUpdate";
 
 // Spinners
-import Loader from "./component/Spinners/Loader";
 import RouteChangeLoader from "./component/Spinners/RouteChangeLoader";
 import PaymentSuccess from "./component/Modals/TicketModal/PaymentSuccess";
 import PaymentCancel from "./component/Modals/TicketModal/PaymentCancel";
-import UsingHooks from "./component/Payment/UsingHooks";
-import EventDescriptionInput from "./component/Event/EventDescripionInput";
-import PaystackCheckout from "./component/Payment/PaystackCheckout";
 import TicketPage from "./component/Ticket/TicketPage";
 import CheckInPage from "./component/Ticket/CheckInPage";
 import ProfilePage from "./component/User/Profile/ProfilePage";
-import PreviewDescription from "./component/Modals/EventModal/PreviewDescription";
 import TicketScanner from "./component/Ticket/TicketScanner";
 import TicketCheckIn from "./component/Ticket/TicketCheckIn";
-import LocationSelector from "./component/Event/EventLocation/LocationSelector";
-import CountrySelect from "./component/Event/EventLocation/CountrySelect";
+import EventListLayout from "./component/Event/EventListLayout";
 
 function App() {
   const dispatch = useDispatch();
@@ -65,10 +52,6 @@ function App() {
   const { user, themeMode } = useSelector((state) => state.user);
   const isAuthPage = ["/login", "/register"].includes(location.pathname);
 
-  // Sync theme on mount and when themeMode changes
-  // useEffect(() => {
-  //   document.documentElement.classList.toggle("dark", themeMode === "dark");
-  // }, [themeMode]);
   useEffect(() => {
     if (themeMode === "dark") {
       document.documentElement.classList.add("dark");
@@ -77,7 +60,6 @@ function App() {
     }
   }, [themeMode]);
 
-  // Fetch user on app load
   useEffect(() => {
     dispatch(getUser());
   }, [dispatch]);
@@ -95,19 +77,12 @@ function App() {
       dispatch(fetchNotifications());
     }
   }, [user, dispatch]);
-  
-    // useEffect(() => {
-    //   if ((user, notifications)) {
-    //     dispatch(fetchNotifications());
-    //   }
-    // }, [user, dispatch, notifications]);
 
   return (
     <>
       <RouteChangeLoader />
       <ScrollToTop />
       <Routes>
-        {/* Public Routes */}
         <Route
           path="/"
           element={
@@ -133,38 +108,6 @@ function App() {
           }
         />
         <Route
-          path="/events"
-          element={
-            <Layout>
-              <Events />
-            </Layout>
-          }
-        />
-        <Route
-          path="/create"
-          element={
-            <Layout>
-              <Organizer />
-            </Layout>
-          }
-        />
-        <Route
-          path="/faq"
-          element={
-            <Layout>
-              <FAQ />
-            </Layout>
-          }
-        />
-        <Route
-          path="/reviews"
-          element={
-            <Layout>
-              <Reviews />
-            </Layout>
-          }
-        />
-        <Route
           path="/check-in/:ticketId"
           element={
             <Layout>
@@ -172,14 +115,9 @@ function App() {
             </Layout>
           }
         />
-        <Route path="/hooks" element={<UsingHooks />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/paystack-checkout" element={<PaystackCheckout />} />
-        <Route path="/location" element={<LocationSelector />} />
-        <Route path="/country" element={<CountrySelect />} />
 
-        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -191,11 +129,11 @@ function App() {
           }
         />
         <Route
-          path="/preview"
+          path="/event-list"
           element={
             <ProtectedRoute>
               <UserLayout>
-                <PreviewDescription />
+                <EventListLayout />
               </UserLayout>
             </ProtectedRoute>
           }
@@ -216,16 +154,6 @@ function App() {
             <ProtectedRoute>
               <UserLayout>
                 <TicketPage />
-              </UserLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/description"
-          element={
-            <ProtectedRoute>
-              <UserLayout>
-                <EventDescriptionInput />
               </UserLayout>
             </ProtectedRoute>
           }
@@ -271,26 +199,6 @@ function App() {
           }
         />
         <Route
-          path="/ticket"
-          element={
-            <ProtectedRoute>
-              <UserLayout>
-                <Ticket />
-              </UserLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/purchase-ticket"
-          element={
-            <ProtectedRoute>
-              <UserLayout>
-                <PurchaseTicketModal />
-              </UserLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/create-event"
           element={
             <ProtectedRoute>
@@ -318,14 +226,6 @@ function App() {
                 <MyTickets />
               </UserLayout>
             </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/loader"
-          element={
-            <UserLayout>
-              <Loader />
-            </UserLayout>
           }
         />
         <Route
@@ -359,16 +259,6 @@ function App() {
           }
         />
         <Route
-          path="/event-list"
-          element={
-            <ProtectedRoute>
-              <UserLayout>
-                <EventListLayout />
-              </UserLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/settings"
           element={
             <ProtectedRoute>
@@ -389,7 +279,6 @@ function App() {
           }
         />
 
-        {/* Not Found & Fallback */}
         <Route path="/page-not-found" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/page-not-found" replace />} />
       </Routes>

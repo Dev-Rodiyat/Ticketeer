@@ -5,8 +5,6 @@ import { toast } from "react-toastify";
 import EventDescriptionEditor from "./EventDescripionInput";
 import Loader from "../Spinners/Loader";
 import PreviewDescription from "../Modals/EventModal/PreviewDescription";
-import CountrySelect from "./EventLocation/CountrySelect";
-// import { Select } from "@headlessui/react";
 import Select from "react-select";
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -233,7 +231,7 @@ const CreateEvent = () => {
                   <input
                     type="date"
                     name="startDate"
-                    className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3"
+                    className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
                     onChange={handleInputChange}
                     value={eventData.startDate}
                     min={new Date().toISOString().split("T")[0]}
@@ -242,7 +240,7 @@ const CreateEvent = () => {
                   <input
                     type="time"
                     name="startTime"
-                    className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3"
+                    className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
                     onChange={handleInputChange}
                     value={eventData.startTime}
                     required
@@ -259,7 +257,7 @@ const CreateEvent = () => {
                   <input
                     type="date"
                     name="endDate"
-                    className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3"
+                    className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
                     onChange={handleInputChange}
                     value={eventData.endDate}
                     min={new Date().toISOString().split("T")[0]}
@@ -268,7 +266,7 @@ const CreateEvent = () => {
                   <input
                     type="time"
                     name="endTime"
-                    className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3"
+                    className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
                     onChange={handleInputChange}
                     value={eventData.endTime}
                     required
@@ -290,7 +288,7 @@ const CreateEvent = () => {
                     placeholder="Venue"
                     onChange={handleInputChange}
                     value={eventData.location.venueName}
-                    className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3"
+                    className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
                   />
                 </div>
 
@@ -354,7 +352,7 @@ const CreateEvent = () => {
                   placeholder="123 Street Name"
                   value={eventData.location.address}
                   onChange={handleInputChange}
-                  className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3"
+                  className="w-full bg-orange-50 dark:bg-zinc-800 dark:text-zinc-300 border border-orange-300 dark:border-zinc-600 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-orange-400"
                 />
               </div>
             </div>

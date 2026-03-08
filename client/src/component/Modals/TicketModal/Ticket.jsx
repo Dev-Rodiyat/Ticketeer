@@ -3,6 +3,16 @@ import { IoIosCloseCircle } from "react-icons/io";
 import { getTicket } from "../../../redux/reducers/eventSlice";
 import { useDispatch, useSelector } from "react-redux";
 
+const formatPrice = (value) => {
+  if (value === null || value === undefined || isNaN(Number(value))) {
+    return value;
+  }
+  return Number(value).toLocaleString("en-NG", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+};
+
 const Ticket = ({ onClose, ticket }) => {
   const dispatch = useDispatch();
   const {user} = useSelector((state) => state.user)
@@ -89,7 +99,8 @@ const Ticket = ({ onClose, ticket }) => {
             {ticket?.ticketTypeId?.type}
           </p>
           <p>
-            <span className="font-semibold">Price:</span> ${ticket?.ticketTypeId?.price}
+            <span className="font-semibold">Price:</span> ₦
+            {formatPrice(ticket?.ticketTypeId?.price)}
           </p>
           <p>
             <span className="font-semibold">Ticket ID:</span> #{ticket?.ticketTypeId?._id}

@@ -71,7 +71,7 @@ exports.verifyPaystackPayment = async (req, res) => {
       .json({
         success: true,
         message: "Tickets purchased successfully",
-        tickets: responsePayload, // 🔥 Add this
+        tickets: responsePayload,
       });  
     } else {
       return res
@@ -92,7 +92,7 @@ exports.validateTicketPurchaseController = async (req, res) => {
     const { selectedTickets, eventId } = req.body;
     const userId = req.userId;
 
-    await validateTicketSelection({ selectedTickets, eventId, userId }); // shared logic
+    await validateTicketSelection({ selectedTickets, eventId, userId });
 
     res.json({ success: true });
   } catch (err) {

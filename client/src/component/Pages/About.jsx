@@ -71,9 +71,11 @@ const About = () => {
               <p className="font-montserrat font-semibold text-lg sm:text-2xl text-center">
                 Search, book, and attend with digital tickets.
               </p>
-              <button className="font-inter bg-zinc-500 py-2 px-8 sm:px-20 text-lg text-white rounded-lg hover:bg-zinc-600 transition-colors w-full sm:w-auto">
-                Book Ticket
-              </button>
+              <Link to='/event-list'>
+                <button className="font-inter bg-zinc-500 py-2 px-8 sm:px-20 text-lg text-white rounded-lg hover:bg-zinc-600 transition-colors w-full sm:w-auto">
+                  Book Ticket
+                </button>
+              </Link>
             </div>
 
             {/* Box 2 */}
@@ -81,9 +83,11 @@ const About = () => {
               <p className="font-montserrat font-semibold text-lg sm:text-2xl text-center">
                 Create, manage, and sell event tickets effortlessly.
               </p>
-              <button className="font-inter bg-zinc-500 py-2 px-8 sm:px-20 text-lg text-white rounded-lg hover:bg-zinc-600 transition-colors w-full sm:w-auto">
-                Create Event
-              </button>
+              <Link to='/create-event'>
+                <button className="font-inter bg-zinc-500 py-2 px-8 sm:px-20 text-lg text-white rounded-lg hover:bg-zinc-600 transition-colors w-full sm:w-auto">
+                  Create Event
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -99,16 +103,18 @@ const About = () => {
 
           <div className="bg-aboutCheer bg-cover bg-center flex flex-col gap-10 items-center w-11/12 lg:w-10/12 p-10 sm:p-20 rounded-xl">
             <div className="flex flex-col gap-4 sm:gap-10">
-              <p className="font-inter font-semibold text-lg sm:text-3xl text-white">
+              <p className="font-inter font-semibold text-lg sm:text-3xl lg:text-4xl text-white">
                 We connect people to unforgettable experiences with
                 <span className="font-cormorant font-medium text-2xl sm:text-6xl">
                   {" "}
                   seamless ticketing solutions.
                 </span>
               </p>
-              <button className="px-4 sm:px-12 py-2.5 bg-orange-400 w-2/3 sm:w-1/3 text-white font-medium rounded-full text-sm transition-colors duration-500 hover:bg-orange-500">
-                Check it out
-              </button>
+              <Link to='/event-list'>
+                <button className="px-4 sm:px-12 py-2.5 bg-orange-400 w-2/3 sm:w-1/6 text-white font-medium rounded-full text-sm transition-colors duration-500 hover:bg-orange-500">
+                  Check it out
+                </button>
+              </Link>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-6">

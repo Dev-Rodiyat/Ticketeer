@@ -213,9 +213,9 @@ const AddTicketModal = ({ isOpen, onClose, event, getEventDetails }) => {
                       {loading ?
                         <>
                           <ClipLoader size={20} color="#fff" />
-                          Creating...
+                          Adding...
                         </>
-                        : "Create Ticket"}
+                        : "Add Ticket"}
                     </button>
                   </div>
                 </form>

@@ -18,7 +18,7 @@ exports.createCheckoutSession = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const fee = ticket.price * 0.02;
+    const fee = ticket.price * 0.05;
     const total = ticket.price + fee;
 
     const session = await stripe.checkout.sessions.create({

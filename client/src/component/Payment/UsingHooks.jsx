@@ -8,13 +8,13 @@ import Loader from "../Spinners/Loader";
 export default function UsingHooks({ user, event, selectedTickets, tickets }) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false); // NEW
+  const [isVerifying, setIsVerifying] = useState(false);
 
-  // Calculate total with 2% fee
+  // Calculate total with 5% fee
   const total = selectedTickets.reduce((sum, { ticketTypeId, quantity }) => {
     const ticket = tickets.find((t) => t._id === ticketTypeId);
     if (!ticket) return sum;
-    const fee = ticket.price * 0.02;
+    const fee = ticket.price * 0.05; // 5% fee
     return sum + (ticket.price + fee) * quantity;
   }, 0);
 
@@ -26,7 +26,7 @@ export default function UsingHooks({ user, event, selectedTickets, tickets }) {
     payment_options: "card,ussd,banktransfer",
     customer: {
       email: user?.email,
-      phone_number: "070********", // optional: user.phone
+      phone_number: "070********",
       name: user?.name,
     },
     customizations: {
@@ -62,7 +62,7 @@ export default function UsingHooks({ user, event, selectedTickets, tickets }) {
       handleFlutterPayment({
         callback: async (response) => {
           closePaymentModal();
-          setIsVerifying(true); // NEW: show loader after popup success
+          setIsVerifying(true);
 
           try {
             const res = await api.post(
@@ -120,13 +120,17 @@ export default function UsingHooks({ user, event, selectedTickets, tickets }) {
       <button
         onClick={handleClick}
         disabled={isLoading}
-        className={`mt-4 self-start px-10 py-3 ${
-          isLoading
+        className={`mt-4 self-start px-10 py-3 ${isLoading
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-orange-500 hover:bg-orange-600"
-        } text-white font-semibold rounded-full transition`}
+          } text-white font-semibold rounded-full transition`}
       >
-        {isLoading ? "Processing..." : `Pay ₦${total.toFixed(2)}`}
+        {isLoading
+          ? "Processing..."
+          : `Pay ₦${total.toLocaleString("en-NG", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`}
       </button>
     </>
   );

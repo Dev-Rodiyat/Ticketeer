@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUpcomingEvents, getUserFavouriteEvents } from "../../../redux/reducers/eventSlice";
 import Loader from "../../Spinners/Loader";
 import { toast } from "react-toastify";
+import { Country, State, City } from 'country-state-city';
 
 const formatTime = (timeString) => {
   const [hours, minutes] = timeString.split(":"); // Split "HH:mm" format
@@ -33,26 +34,32 @@ const FavouriteEvents = () => {
   const location = useLocation();
 
   const dispatch = useDispatch();
-  
-   useEffect(() => {
-      dispatch(getUpcomingEvents()); // Fetch upcoming events on component mount
-    }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getUpcomingEvents()); // Fetch upcoming events on component mount
+  }, [dispatch]);
 
   const { user, isAuthenticated } = useSelector((state) => state.user);
   const currentUserId = useSelector((state) => state.user.user._id);
-  const {upcomingEvents,loading, error } = useSelector((state) => state.events)
-  console.log(upcomingEvents)
-  console.log(upcomingEvents)
+  const { upcomingEvents, loading, error } = useSelector((state) => state.events)
 
-  if(loading.upcomingEvents) {
-    return <Loader loading={loading.upcomingEvents}/>
+  const getCountryName = (code) =>
+    Country.getCountryByCode(code)?.name || code;
+
+  const getStateName = (code, countryCode) =>
+    State.getStatesOfCountry(countryCode)?.find((s) => s.isoCode === code)?.name || code;
+
+  const getCityName = (name, stateCode, countryCode) =>
+    City.getCitiesOfState(countryCode, stateCode)?.find((c) => c.name === name)?.name || name;
+
+  if (loading.upcomingEvents) {
+    return <Loader loading={loading.upcomingEvents} />
   }
-  if(error) {
+  if (error) {
     return toast.error(error)
   }
-    // const { upcomingEvents } = useSelector((state) => state.events);
-  
-  console.log(upcomingEvents)
+  // const { upcomingEvents } = useSelector((state) => state.events);
+
 
   // useEffect(() => {
   //   if(user && isAuthenticated) {
@@ -73,10 +80,8 @@ const FavouriteEvents = () => {
 
   const likedEvents = upcomingEvents.filter(event =>
     event.likedUsers?.some(user => user._id === currentUserId)
-  );  
+  );
 
-  console.log(upcomingEvents)
-  console.log(likedEvents)
   return (
     <section className="mt-10 font-inter mb-20">
       <div className="flex flex-col gap-8">
@@ -93,9 +98,8 @@ const FavouriteEvents = () => {
               </p>
 
               <div className="flex flex-col lg:flex-row gap-6 bg-orange-50 dark:bg-zinc-800 bg-opacity-50 rounded-xl p-4">
-                {/* Event Info */}
                 <div className="flex-1 flex flex-col gap-3">
-                  <div>
+                  <div className="space-y-2">
                     <p className="text-base text-zinc-600 dark:text-zinc-300">
                       {formatTime(favourite.startTime)}
                     </p>
@@ -108,15 +112,15 @@ const FavouriteEvents = () => {
                     <div className="w-8 h-8 rounded-full overflow-hidden bg-white dark:bg-zinc-700 shadow-sm">
                       <img
                         src={
-                          favourite.organizer?.photo?.imageUrl ||
-                          favourite.organizer?.photo
+                          favourite?.organizer?.photo?.imageUrl ||
+                          favourite?.organizer?.photo
                         }
                         alt="Organizer"
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                      Hosted by {favourite.organizer.name}{" "}
+                      Hosted by {favourite?.organizer.name}{" "}
                       {user?._id === favourite?.organizer?._id && (
                         <span className="text-xs text-zinc-500 dark:text-zinc-400">
                           (you)
@@ -125,22 +129,24 @@ const FavouriteEvents = () => {
                     </p>
                   </div>
 
-                  <div className="flex gap-2 items-center mt-1 text-sm text-zinc-700 dark:text-zinc-300">
-                      <>
-                        <IoVideocamOutline size={18} />
-                        <a
-                          href={favourite.meetLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 underline"
-                        >
-                          Join Meeting
-                        </a>
-                      </>
-                      <>
-                        <IoLocationOutline size={18} />
-                        <p>{`${favourite.location[2]}, ${favourite.location[1]}`}</p>
-                      </>
+                  <div className="flex flex-col gap-3 mt-2 text-sm text-zinc-700 dark:text-zinc-300">
+                    <div className="flex gap-2">
+                      <IoVideocamOutline size={18} />
+                      <a
+                        href={favourite.meetLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 underline"
+                      >
+                        Join Meeting
+                      </a>
+                    </div>
+                    <div className="flex gap-2">
+                      <IoLocationOutline size={18} />
+                      {getCityName(favourite.location[3], favourite.location[2], favourite.location[1])},{" "}
+                      {getStateName(favourite.location[2], favourite.location[1])},{" "}
+                      {getCountryName(favourite.location[1])}
+                    </div>
                   </div>
 
                   <button
@@ -176,9 +182,11 @@ const FavouriteEvents = () => {
                 </p>
               </div>
               <div className="flex gap-4 mt-4">
-                <button className="px-6 py-2 bg-orange-500 text-white font-medium rounded-full text-sm hover:bg-orange-600 transition">
-                  Explore events
-                </button>
+                <Link to='/event-list'>
+                  <button className="px-6 py-2 bg-orange-500 text-white font-medium rounded-full text-sm hover:bg-orange-600 transition">
+                    Explore events
+                  </button>
+                </Link>
                 <Link to="/create-event">
                   <button className="px-6 py-2 bg-slate-600 text-white font-medium rounded-full text-sm hover:bg-slate-700 transition">
                     Create event

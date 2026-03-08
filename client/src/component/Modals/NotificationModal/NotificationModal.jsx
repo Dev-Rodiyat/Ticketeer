@@ -69,7 +69,7 @@ const NotificationModal = ({ onClose }) => {
         </div>
 
         {/* Notifications List */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-3 space-y-3 max-h-[70vh]">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-3 space-y-3 max-h-[80vh]">
           {Array.isArray(notifications) && notifications.length > 0 ? (
             notifications.map((note) => (
               <div
@@ -80,7 +80,7 @@ const NotificationModal = ({ onClose }) => {
                   <p className="text-sm text-zinc-800 dark:text-zinc-200">
                     {note.message}
                   </p>
-                  <span className="text-xs text-zinc-500 ml-2">
+                  <span className="text-xs text-zinc-500">
                     {new Date(note.createdAt).toLocaleString()}
                   </span>
                 </div>

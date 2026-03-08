@@ -1,5 +1,15 @@
 import React from "react";
 
+const formatPrice = (value) => {
+  if (value === null || value === undefined || isNaN(Number(value))) {
+    return value;
+  }
+  return Number(value).toLocaleString("en-NG", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+};
+
 const TicketInfoModal = ({ ticket, isOpen, onClose }) => {
   if (!isOpen || !ticket) return null;
 
@@ -20,7 +30,7 @@ const TicketInfoModal = ({ ticket, isOpen, onClose }) => {
             <span className="font-medium">Type:</span> {ticket.type}
           </div>
           <div>
-            <span className="font-medium">Price:</span> ₦{ticket.price}
+            <span className="font-medium">Price:</span> ₦{formatPrice(ticket.price)}
           </div>
           <div>
             <span className="font-medium">Total Quantity:</span> {ticket.totalQuantity}
@@ -31,13 +41,10 @@ const TicketInfoModal = ({ ticket, isOpen, onClose }) => {
           <div>
             <span className="font-medium">Available:</span> {ticket.availableQuantity}
           </div>
-          <div>
-            <span className="font-medium">Descripton:</span> {ticket?.description}
-          </div>
           {ticket.description && (
             <div>
               <span className="font-medium">Description:</span>{" "}
-              <p className="text-gray-600 dark:text-gray-300 mt-1">{ticket.description}</p>
+              <span className="text-gray-600 dark:text-gray-300 mt-1">{ticket.description}</span>
             </div>
           )}
         </div>

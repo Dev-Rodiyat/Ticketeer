@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../Spinners/Loader";
 import { FaArrowLeft } from "react-icons/fa";
+import { City, Country, State } from "country-state-city";
 
 const CLIENT_URL = import.meta.env.VITE_CLIENT_URL
 
@@ -55,6 +56,15 @@ const TicketPage = () => {
     navigate(location.state?.from || "/my-tickets" || "/dashboard");
   };
 
+  const getCountryName = (code) =>
+    Country.getCountryByCode(code)?.name || code;
+
+  const getStateName = (code, countryCode) =>
+    State.getStatesOfCountry(countryCode)?.find((s) => s.isoCode === code)?.name || code;
+
+  const getCityName = (name, stateCode, countryCode) =>
+    City.getCitiesOfState(countryCode, stateCode)?.find((c) => c.name === name)?.name || name;
+
   return (
     <div className="w-full min-h-screen bg-orange-50 dark:bg-zinc-950 px-4 py-28 font-inter flex items-center justify-center">
       <div className="w-full max-w-md flex gap-4">
@@ -73,8 +83,8 @@ const TicketPage = () => {
           </h2>
 
           <div className="border border-zinc-200 dark:border-zinc-700 bg-orange-50 dark:bg-zinc-800 rounded-xl p-6 flex flex-col gap-6">
-           
-            <QRCode value={checkInUrl} style={{ width: 256, height: 256 }}/>
+
+            <QRCode value={checkInUrl} style={{ width: 256, height: 256 }} />
 
             {/* Ticket Info */}
             <div className="text-sm text-zinc-700 dark:text-zinc-300 space-y-2">
@@ -91,21 +101,21 @@ const TicketPage = () => {
                 <strong>Type:</strong> {ticketTypeId?.type || "N/A"}
               </p>
 
-                <p>
-                  <strong>Location:</strong>{" "}
-                  {eventId?.location?.join(", ") || "N/A"}
-                </p>
-                <p>
-                  <strong>Meet Link:</strong>{" "}
-                  <a
-                    href={eventId?.meetLink || "#"}
-                    className="text-blue-500 dark:text-blue-400 underline"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Join Event
-                  </a>
-                </p>
+              <p>
+                <strong>Location:</strong>{" "}
+                {eventId?.location?.join(", ") || "N/A"}
+              </p>
+              <p>
+                <strong>Meet Link:</strong>{" "}
+                <a
+                  href={eventId?.meetLink || "#"}
+                  className="text-blue-500 dark:text-blue-400 underline"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Join Event
+                </a>
+              </p>
 
               <p>
                 <strong>Status:</strong> {computedStatus || "N/A"}

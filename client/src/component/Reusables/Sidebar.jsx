@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaCog, FaHome } from "react-icons/fa";
 import { MdOutlineEventNote, MdCreateNewFolder } from "react-icons/md";
+import { MdEventNote, MdEventAvailable, MdCalendarMonth } from "react-icons/md";
 import { LuTicket } from "react-icons/lu";
 
 const sideLink = [
@@ -17,12 +18,13 @@ const sideLink = [
 
 const iconMap = {
   Dashboard: FaHome,
-  "Create Event": MdCreateNewFolder,
-  Events: MdOutlineEventNote,
-  "My Events": MdOutlineEventNote,
+  "Create Event": MdEventAvailable,
+  Events: MdEventNote,
+  "My Events": MdCalendarMonth,
   "My Tickets": LuTicket,
   Settings: FaCog,
 };
+
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
