@@ -355,6 +355,14 @@ const EventDetails = () => {
 
   const refetchEventDetails = () => dispatch(getEventDetails(eventId));
 
+  const maxTicketTypes = 5;
+  const ticketTypeCount = eventDetails?.ticketTypes?.length || 0;
+  const ticketsLeft = Math.max(maxTicketTypes - ticketTypeCount, 0);
+  const ticketUsagePercent = Math.min(
+    (ticketTypeCount / maxTicketTypes) * 100,
+    100
+  );
+
   // const event = eventDetails
 
   // console.log({event})
@@ -600,7 +608,7 @@ const EventDetails = () => {
                 </div>
                 {eventDetails &&
                   eventDetails?.ticketTypes &&
-                  eventDetails?.ticketTypes.length < 4 &&
+                  eventDetails?.ticketTypes.length < maxTicketTypes &&
                   new Date(eventDetails.startDate) > new Date() && (
                     <button
                       onClick={openAddTicketModal}
@@ -609,6 +617,42 @@ const EventDetails = () => {
                       + Add Ticket
                     </button>
                   )}
+              </div>
+
+              <div className="mb-4 p-3 rounded-xl bg-white/40 dark:bg-zinc-800/60 border border-orange-200/60 dark:border-zinc-700 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-orange-500/10 text-orange-600 dark:text-orange-300">
+                    <TbTicket size={18} />
+                  </span>
+                  <div className="flex flex-col">
+                    <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-100 uppercase tracking-wide">
+                      Ticket type slots
+                    </p>
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                      {ticketTypeCount} of {maxTicketTypes} used ·{" "}
+                      {ticketsLeft} left
+                    </p>
+                  </div>
+                </div>
+                <div className="hidden sm:flex flex-col items-end gap-1">
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
+                      ticketsLeft === 0
+                        ? "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-300"
+                        : "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
+                    }`}
+                  >
+                    {ticketsLeft === 0
+                      ? "Limit reached"
+                      : `${ticketsLeft} remaining`}
+                  </span>
+                  <div className="w-24 h-1.5 rounded-full bg-orange-100 dark:bg-zinc-700 overflow-hidden">
+                    <div
+                      className="h-full bg-orange-500 dark:bg-orange-400 transition-all"
+                      style={{ width: `${ticketUsagePercent}%` }}
+                    />
+                  </div>
+                </div>
               </div>
 
               {eventDetails?.ticketTypes?.length > 0 ? (
@@ -654,6 +698,10 @@ const EventDetails = () => {
                   No ticket types available yet.
                 </p>
               )}
+
+              <p className="mt-4 text-[11px] text-gray-600 dark:text-gray-400 text-center">
+                You can create up to {maxTicketTypes} ticket types for an event.
+              </p>
 
               {/* Optional Edit Ticket Modal */}
               {ticketModalOpen && selectedTicket && (

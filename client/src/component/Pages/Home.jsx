@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BsBell } from "react-icons/bs";
-import { FaCalendarTimes, FaCube, FaMobileAlt, FaShareAlt } from "react-icons/fa";
+import { FaArrowUp, FaCalendarTimes, FaCube, FaMobileAlt, FaShareAlt } from "react-icons/fa";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa6";
 import { TbCurrencyNaira } from "react-icons/tb";
 import { BiSolidPurchaseTag } from "react-icons/bi";
@@ -223,9 +223,12 @@ const Home = () => {
               </button>
             </Link>
           </div>
-          <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-xs uppercase tracking-widest text-white/80 animate-bounce">
-            Scroll to explore
-          </p>
+          <div className="flex gap-2 absolute bottom-8 left-1/2 -translate-x-1/2 text-xs uppercase tracking-widest text-white/80 animate-bounce">
+            <p className="">
+              Scroll to explore
+            </p>
+            <FaArrowUp size={18} />
+          </div>
         </div>
       </section>
 

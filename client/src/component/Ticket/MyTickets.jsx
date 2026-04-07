@@ -296,29 +296,39 @@ const MyTickets = () => {
             ))}
           </div>
         ) : (
-          <div className="border-l-4 border-orange-500 font-inter text-gray-700 dark:text-zinc-200 text-center px-4 sm:px-10">
-            <div className="flex flex-col items-center gap-6 justify-center px-6 py-10 bg-orange-100 dark:bg-zinc-800 bg-opacity-60 rounded-xl shadow-sm">
+          <div className="border-l-4 border-orange-500 bg-orange-100/60 dark:bg-zinc-800/70 rounded-2xl shadow-md px-6 py-10 text-center text-gray-700 dark:text-zinc-200">
+            <div className="flex flex-col items-center gap-6 justify-center max-w-xl mx-auto">
               <MdEventBusy
-                size={120}
-                className="text-gray-400 dark:text-zinc-500"
+                size={96}
+                className="text-zinc-400 dark:text-zinc-500"
               />
               <div className="flex flex-col gap-1">
                 <p className="font-semibold text-xl text-zinc-700 dark:text-zinc-100">
-                  No tickets found
+                  {isAnyFilterActive ? "No tickets match your filters" : "No tickets found"}
                 </p>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  Try adjusting your filters or search query.
+                  {isAnyFilterActive
+                    ? "Try changing your search, date, ticket type, or category to see more tickets."
+                    : "You don’t have any tickets yet. Explore events or create one to get started."}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-4 items-center justify-center">
+              <div className="flex flex-wrap gap-4 items-center justify-center mt-2">
+                {isAnyFilterActive && (
+                  <button
+                    onClick={resetFilters}
+                    className="px-5 py-2 bg-white/80 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-100 rounded-full text-sm border border-orange-200 dark:border-zinc-600 hover:bg-white dark:hover:bg-zinc-600 transition"
+                  >
+                    Clear filters
+                  </button>
+                )}
                 <Link to="/event-list">
                   <button className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-full text-sm transition">
-                    Explore Events
+                    Explore events
                   </button>
                 </Link>
                 <Link to="/create-event">
-                  <button className="px-6 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-md text-sm transition">
-                    Create Event
+                  <button className="px-6 py-2 bg-zinc-700 hover:bg-zinc-800 text-white rounded-full text-sm transition">
+                    Create event
                   </button>
                 </Link>
               </div>
